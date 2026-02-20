@@ -1,4 +1,5 @@
 ---
+const pathname = Astro.url.pathname;
 const nav = [
   { label: 'Topics', href: '/topics' },
   { label: 'Evidence', href: '/evidence' },
@@ -13,7 +14,13 @@ const nav = [
 
     <nav class="nav" aria-label="Primary">
       {nav.map((item) => (
-        <a class="nav-link text-link" href={item.href}>{item.label}</a>
+        <a
+          class:list={['nav-link', pathname.startsWith(item.href) && 'is-active']}
+          href={item.href}
+          aria-current={pathname.startsWith(item.href) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
       ))}
     </nav>
   </div>
@@ -24,9 +31,10 @@ const nav = [
     position: sticky;
     top: 0;
     z-index: 50;
-    background: var(--bg-surface);
+    background: rgba(15, 18, 23, 0.75);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--rule);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
   }
   .header-inner {
     min-height: 74px;
@@ -50,17 +58,29 @@ const nav = [
     justify-content: flex-end;
   }
   .nav-link {
-    color: var(--text-primary);
-    opacity: 0.86;
-    font-size: 0.98rem;
+    color: var(--text-secondary);
+    font-size: 0.94rem;
     white-space: nowrap;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 180ms ease, border-color 180ms ease;
   }
   .nav-link:hover {
-    opacity: 1;
+    color: var(--text-primary);
+    border-color: rgba(230, 234, 240, 0.35);
+  }
+  .nav-link.is-active {
+    color: var(--text-primary);
+    border-color: var(--accent);
   }
   @media (max-width: 760px) {
     .header-inner { min-height: 66px; }
-    .nav { gap: 14px; }
+    .nav {
+      gap: 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav::-webkit-scrollbar { display: none; }
     .nav-link { font-size: 0.87rem; }
   }
 </style>
