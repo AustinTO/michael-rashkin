@@ -1,0 +1,73 @@
+---
+const action = process.env.PUBLIC_CONTACT_FORM_ACTION;
+const disabled = !action;
+---
+<form class="card" method="post" action={action || undefined}>
+  <h2 style="margin-top:0;">Send a message</h2>
+
+  <div class="grid grid-2" style="margin-top: 10px;">
+    <label>
+      <div class="label">Name</div>
+      <input class="input" name="name" required />
+    </label>
+    <label>
+      <div class="label">Email</div>
+      <input class="input" type="email" name="email" required />
+    </label>
+  </div>
+
+  <label style="display:block; margin-top: 12px;">
+    <div class="label">Organization (optional)</div>
+    <input class="input" name="organization" />
+  </label>
+
+  <label style="display:block; margin-top: 12px;">
+    <div class="label">Route</div>
+    <select class="input" name="route" required>
+      <option value="">Select…</option>
+      <option>Media request</option>
+      <option>Speaking request</option>
+      <option>Collaboration / partnership</option>
+      <option>Correction or challenge</option>
+      <option>General message</option>
+    </select>
+  </label>
+
+  <label style="display:block; margin-top: 12px;">
+    <div class="label">Topic (optional)</div>
+    <input class="input" name="topic" />
+  </label>
+
+  <label style="display:block; margin-top: 12px;">
+    <div class="label">Message</div>
+    <textarea class="input" name="message" rows="6" required></textarea>
+  </label>
+
+  <label class="check" style="margin-top: 12px; display:flex; gap: 10px; align-items: flex-start;">
+    <input type="checkbox" name="noMedicalAdvice" required />
+    <span class="small">I understand this message does not request personal medical advice.</span>
+  </label>
+
+  <div style="margin-top: 14px; display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
+    <button class="button primary" type="submit" disabled={disabled}>Submit</button>
+    {disabled ? <span class="small muted">Set <span class="kbd">PUBLIC_CONTACT_FORM_ACTION</span> in <span class="kbd">.env</span> to enable submissions.</span> : null}
+  </div>
+
+  <p class="small muted" style="margin-top: 14px;">
+    Media request: Please include your deadline, format, and topic.
+    <br />
+    Correction or challenge: Please include the page URL and the specific statement you’re challenging.
+  </p>
+
+  <style>
+    .label { font-size: 12px; color: var(--muted); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      font-family: inherit;
+    }
+  </style>
+</form>

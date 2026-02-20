@@ -1,0 +1,86 @@
+---
+const legal = [
+  { label: 'Newsletter', href: '/newsletter' },
+  { label: 'Corrections', href: '/evidence/corrections-policy' },
+  { label: 'Editorial Policy', href: '/evidence/editorial-policy' },
+  { label: 'Disclosures', href: '/evidence/disclosures' },
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms', href: '/terms' },
+  { label: 'Cookie Policy', href: '/cookies' },
+  { label: 'Accessibility', href: '/accessibility' },
+  { label: 'Disclaimer', href: '/disclaimer' }
+];
+
+const utility = [
+  { label: 'Links', href: '/links' },
+  { label: 'Topics', href: '/topics' },
+  { label: 'Media', href: '/media' },
+  { label: 'Insights', href: '/insights' },
+  { label: 'Policy', href: '/policy' }
+];
+---
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div>
+      <div class="footer-title">Michael Rashkin</div>
+      <p class="muted small" style="max-width: 48ch; margin-top: 8px;">
+        Evidence-first analysis on nutrition and population health.
+        Strong opinions are labeled. Sources are included. Corrections are public.
+      </p>
+      <p class="small muted" style="margin-top: 10px;">
+        This site is for educational and informational purposes only. It is not medical advice.
+      </p>
+    </div>
+
+    <div>
+      <div class="footer-title">Explore</div>
+      <ul class="footer-list">
+        {utility.map((l) => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div>
+      <div class="footer-title">Legal & standards</div>
+      <ul class="footer-list">
+        {legal.map((l) => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top: 14px; padding-bottom: 24px;">
+    <div class="small muted">© {new Date().getFullYear()} Michael Rashkin. All rights reserved.</div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 60px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-muted);
+  }
+  .footer-inner {
+    padding-top: 28px;
+    padding-bottom: 10px;
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+  .footer-title { font-weight: 800; }
+  .footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    display: grid;
+    gap: 8px;
+  }
+  .footer-list a { color: var(--muted); font-weight: 600; font-size: 14px; }
+  .footer-list a:hover { color: var(--text); text-decoration: none; }
+
+  @media (max-width: 900px) {
+    .footer-inner { grid-template-columns: 1fr; }
+  }
+</style>

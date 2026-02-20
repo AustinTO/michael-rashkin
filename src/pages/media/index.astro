@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContentCard from '../../components/ContentCard.astro';
+
+import { sanityFetch } from '../../lib/sanity';
+import { Q } from '../../lib/queries';
+import type { ContentCardItem } from '../../lib/types';
+
+const items = await sanityFetch<ContentCardItem[]>(Q.allMedia).catch(() => []);
+---
+<BaseLayout title="Media — Michael Rashkin" description="All videos and interviews with summaries, transcripts, and sources.">
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">
+      <h1>Media</h1>
+      <p class="muted">All videos and interviews live here with summaries, transcripts, and sources.</p>
+    </div>
+
+    <div class="grid grid-3" style="margin-top: 14px;">
+      {items.length ? items.map((item) => (
+        <ContentCard href={`/media/${item.slug}`} title={item.title} contentType={item.contentType} date={item.date} excerpt={item.excerpt} />
+      )) : (
+        <div class="card" style="grid-column: 1 / -1;">
+          <div style="font-weight: 900;">No episodes yet</div>
+          <p class="muted" style="margin: 8px 0 0;">Create <span class="kbd">mediaEpisode</span> documents in Sanity Studio.</p>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

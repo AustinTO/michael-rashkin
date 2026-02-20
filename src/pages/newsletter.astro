@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
+---
+<BaseLayout title="Newsletter — Michael Rashkin" description="One email per week. Evidence-forward analysis. Links to newest topic updates and media.">
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">
+      <h1>Newsletter</h1>
+      <p>
+        One email per week. Evidence-forward analysis. Links to the newest topic updates and media.
+        When I change my mind, I tell you why.
+      </p>
+
+      <h2>What you’ll get</h2>
+      <ul>
+        <li>One evidence-based brief per week</li>
+        <li>Links to new topics, episodes, and posts</li>
+        <li>Updates when my view changes</li>
+      </ul>
+
+      <h2>Signup</h2>
+      <NewsletterSignup />
+
+      <p class="muted small">
+        Optional later: add an archive of past issues.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

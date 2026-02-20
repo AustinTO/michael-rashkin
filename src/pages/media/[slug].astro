@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LabelPill from '../../components/LabelPill.astro';
+import UpdatedBadge from '../../components/UpdatedBadge.astro';
+import SourcesList from '../../components/SourcesList.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import ContentCard from '../../components/ContentCard.astro';
+
+import { sanityFetch } from '../../lib/sanity';
+import { Q } from '../../lib/queries';
+import { portableTextToHtml } from '../../lib/portableText';
+import type { ContentCardItem, MediaEpisode } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const items = await sanityFetch<Array<{ slug: string }>>(Q.allMedia).catch(() => []);
+  return items.map((i) => ({ params: { slug: i.slug } }));
+}
+
+const { slug } = Astro.params;
+const ep = await sanityFetch<MediaEpisode>(Q.mediaBySlug, { slug });
+
+const transcriptHtml = portableTextToHtml(ep.transcript);
+const date = ep.updatedAt || ep.publishedAt;
+
+const relatedRaw = ep.primaryTopic?._id
+  ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: ep.primaryTopic._id }).catch(() => [])
+  : [];
+
+const related = relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6);
+---
+<BaseLayout title={`${ep.title} — Michael Rashkin`} description={ep.shortDescription || ep.title}>
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">
+      <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
+        <LabelPill label="Video" />
+        <span class="pill">{ep.platform}</span>
+        <UpdatedBadge date={date} prefix="Published" />
+        {ep.primaryTopic ? <a class="pill" href={`/topics/${ep.primaryTopic.slug}`}>{ep.primaryTopic.title}</a> : null}
+      </div>
+
+      <h1 style="margin-top: 12px;">{ep.title}</h1>
+
+      <div class="embed" style="margin-top: 14px;">
+        <iframe
+          src={ep.embedUrl}
+          title={ep.title}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <style>
+        .embed {
+          width: 100%;
+          aspect-ratio: 16/9;
+          border-radius: var(--radius);
+          overflow: hidden;
+          border: 1px solid var(--border);
+          background: #000;
+        }
+        iframe { width: 100%; height: 100%; border: 0; }
+      </style>
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 12px;">
+    <div class="prose">
+      <h2>Summary</h2>
+      {ep.shortDescription ? <p>{ep.shortDescription}</p> : <p class="muted">Add a short description in Sanity.</p>}
+
+      <h2>Key points</h2>
+      {ep.keyPoints?.length ? (
+        <ul>
+          {ep.keyPoints.map((k) => (<li>{k}</li>))}
+        </ul>
+      ) : (
+        <p class="muted">Add 5–10 bullets in Sanity.</p>
+      )}
+
+      {ep.timestampOutline?.length ? (
+        <>
+          <h2>Time stamps</h2>
+          <ul>
+            {ep.timestampOutline.map((t) => (
+              <li><span class="pill" style="margin-right: 8px;">{t.time}</span>{t.label}</li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+
+      <h2>Transcript</h2>
+      <details class="card" style="max-width: var(--content);">
+        <summary style="cursor:pointer; font-weight: 800;">Show transcript</summary>
+        <div style="margin-top: 12px;" class="prose" set:html={transcriptHtml || '<p class="muted">Add transcript content in Sanity.</p>'}></div>
+      </details>
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 18px;">
+    <div style="max-width: var(--content);">
+      <SourcesList sources={ep.sources} />
+    </div>
+  </section>
+
+  {related.length ? (
+    <section class="container" style="padding-top: 28px;">
+      <h2 style="margin:0;">Related content</h2>
+      <div class="grid grid-3" style="margin-top: 14px;">
+        {related.map((item) => (
+          <ContentCard
+            href={item._type === 'mediaEpisode' ? `/media/${item.slug}` : item._type === 'policyNote' ? `/policy/${item.slug}` : `/insights/${item.slug}`}
+            title={item.title}
+            contentType={item.contentType}
+            date={item.date}
+            excerpt={item.excerpt}
+          />
+        ))}
+      </div>
+    </section>
+  ) : null}
+
+  <section class="container" style="padding-top: 28px;">
+    <NewsletterSignup />
+  </section>
+</BaseLayout>

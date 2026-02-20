@@ -1,0 +1,28 @@
+{
+  "name": "michaelrashkin-site",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "sanity": "sanity"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.5.4",
+    "@portabletext/to-html": "^5.0.1",
+    "@sanity/astro": "^3.2.11",
+    "@sanity/client": "^7.6.0",
+    "@sanity/image-url": "^2.0.3",
+    "@sanity/vision": "^5.11.0",
+    "astro": "^5.0.0",
+    "dotenv": "^17.3.1",
+    "sanity": "^5.11.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

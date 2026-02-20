@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactForm from '../components/ContactForm.astro';
+---
+<BaseLayout title="Contact — Michael Rashkin" description="Media, speaking, collaborations, corrections, and general messages.">
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">
+      <h1>Contact</h1>
+      <p class="muted">For media inquiries, speaking requests, collaborations, corrections, or general messages.</p>
+
+      <div class="card" style="margin-top: 12px;">
+        <div class="small muted" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Media inquiries</div>
+        <div style="margin-top: 6px;">
+          Email: <a href="mailto:media@example.com">media@example.com</a>
+          <span class="muted small">(replace this with your real address)</span>
+        </div>
+      </div>
+
+      <div style="margin-top: 18px; max-width: var(--content);">
+        <ContactForm />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

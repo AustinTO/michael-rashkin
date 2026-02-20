@@ -1,0 +1,7 @@
+---
+import { formatDate } from '../lib/dates';
+const { date, prefix = 'Updated on' } = Astro.props as { date?: string; prefix?: string };
+---
+{date ? (
+  <span class="pill">{prefix} {formatDate(date)}</span>
+) : null}

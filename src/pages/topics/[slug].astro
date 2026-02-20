@@ -1,0 +1,185 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import UpdatedBadge from '../../components/UpdatedBadge.astro';
+import EvidenceSnapshot from '../../components/EvidenceSnapshot.astro';
+import SourcesList from '../../components/SourcesList.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import ContentCard from '../../components/ContentCard.astro';
+import LabelPill from '../../components/LabelPill.astro';
+
+import { sanityFetch } from '../../lib/sanity';
+import { Q } from '../../lib/queries';
+import { portableTextToHtml } from '../../lib/portableText';
+import type { ContentCardItem, Topic } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const topics = await sanityFetch<Array<{ slug: string }>>(Q.allTopics).catch(() => []);
+  return topics.map((t) => ({ params: { slug: t.slug } }));
+}
+
+const { slug } = Astro.params;
+const topic = await sanityFetch<Topic>(Q.topicBySlug, { slug });
+
+const related = topic?._id
+  ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: topic._id }).catch(() => [])
+  : [];
+
+const updated = topic.updatedAt || topic.publishedAt;
+
+const sections = {
+  body: portableTextToHtml(topic.body),
+  whatWeKnow: portableTextToHtml(topic.whatWeKnow),
+  whatWeDontKnowYet: portableTextToHtml(topic.whatWeDontKnowYet),
+  myInterpretation: portableTextToHtml(topic.myInterpretation)
+};
+---
+<BaseLayout title={`${topic.title} — Michael Rashkin`} description={topic.intro || `Topic: ${topic.title}`}>
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">
+      <h1 style="margin-bottom: 10px;">{topic.title}</h1>
+      {topic.intro ? <p class="muted" style="margin-top:0;">{topic.intro}</p> : null}
+      <div style="margin-top: 10px;">
+        <UpdatedBadge date={updated} prefix="Updated on" />
+      </div>
+
+      {sections.body ? (
+        <div class="prose" style="margin-top: 18px;" set:html={sections.body} />
+      ) : null}
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 16px;">
+    <div style="max-width: var(--content);">
+      <EvidenceSnapshot snapshot={topic.evidenceSnapshot} />
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 10px;">
+    <div class="prose">
+      <h2>What we know</h2>
+      {sections.whatWeKnow ? <div set:html={sections.whatWeKnow} /> : <p class="muted">Add content in Sanity to populate this section.</p>}
+
+      <h2>What we don’t know yet</h2>
+      {sections.whatWeDontKnowYet ? <div set:html={sections.whatWeDontKnowYet} /> : <p class="muted">Add content in Sanity to populate this section.</p>}
+
+      <div style="margin-top: 26px; display:flex; align-items:center; gap: 10px;">
+        <h2 style="margin:0;">My interpretation</h2>
+        <LabelPill label="Interpretation / opinion" />
+      </div>
+      {sections.myInterpretation ? <div set:html={sections.myInterpretation} /> : <p class="muted">Add content in Sanity to populate this section.</p>}
+
+      <h2>Key takeaways</h2>
+      {topic.keyTakeaways?.length ? (
+        <ul>
+          {topic.keyTakeaways.map((k) => (<li>{k}</li>))}
+        </ul>
+      ) : (
+        <p class="muted">Add 3–6 bullets in Sanity.</p>
+      )}
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 18px;">
+    <div style="max-width: var(--content);">
+      <SourcesList sources={topic.bestReferences} title="Best references" />
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 28px;">
+    <div style="display:flex; justify-content: space-between; align-items: baseline; gap: 10px;">
+      <h2 style="margin:0;">Related content</h2>
+      <div class="small muted">Auto-listed by topic</div>
+    </div>
+
+    <div class="card" style="margin-top: 12px;" id="filter-bar">
+      <div style="display:flex; gap: 12px; align-items:center; flex-wrap: wrap;">
+        <label class="small" style="display:flex; gap: 8px; align-items:center;">
+          <span class="muted">Format</span>
+          <select class="select" id="format">
+            <option value="all">All</option>
+            <option value="Video">Video</option>
+            <option value="Evidence Brief">Evidence Brief</option>
+            <option value="Deep Dive">Deep Dive</option>
+            <option value="Myth Check">Myth Check</option>
+            <option value="Opinion">Opinion</option>
+            <option value="Policy Note">Policy</option>
+          </select>
+        </label>
+
+        <label class="small" style="display:flex; gap: 8px; align-items:center;">
+          <span class="muted">Sort</span>
+          <select class="select" id="sort">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+          </select>
+        </label>
+      </div>
+
+      <style>
+        .select {
+          padding: 8px 10px;
+          border-radius: 10px;
+          border: 1px solid var(--border);
+          font-size: 14px;
+          background: white;
+        }
+      </style>
+    </div>
+
+    <div class="grid grid-3" style="margin-top: 14px;" id="related-list">
+      {related.length ? related.map((item) => (
+        <ContentCard
+          href={item._type === 'mediaEpisode' ? `/media/${item.slug}` : item._type === 'policyNote' ? `/policy/${item.slug}` : `/insights/${item.slug}`}
+          title={item.title}
+          contentType={item.contentType}
+          date={item.date}
+          excerpt={item.excerpt}
+        />
+      )) : (
+        <div class="card" style="grid-column: 1 / -1;">
+          <div style="font-weight: 900;">No related content yet</div>
+          <p class="muted" style="margin: 8px 0 0;">
+            Create Insights, Policy Notes, or Media Episodes with <span class="kbd">primaryTopic</span> set to this topic.
+          </p>
+        </div>
+      )}
+    </div>
+
+    <script type="module">
+      const formatEl = document.getElementById('format');
+      const sortEl = document.getElementById('sort');
+      const listEl = document.getElementById('related-list');
+      if (!formatEl || !sortEl || !listEl) {
+        // nothing
+      } else {
+        const cards = Array.from(listEl.querySelectorAll('[data-type]'));
+        const getDate = (el) => new Date(el.getAttribute('data-date') || 0).getTime();
+
+        function apply() {
+          const format = formatEl.value;
+          const sort = sortEl.value;
+
+          // filter
+          cards.forEach((c) => {
+            const t = c.getAttribute('data-type');
+            const show = (format === 'all') || (t === format);
+            c.style.display = show ? '' : 'none';
+          });
+
+          // sort (only visible elements, keep hidden at bottom)
+          const visible = cards.filter((c) => c.style.display !== 'none');
+          visible.sort((a, b) => sort === 'newest' ? getDate(b) - getDate(a) : getDate(a) - getDate(b));
+          visible.forEach((c) => listEl.appendChild(c));
+        }
+
+        formatEl.addEventListener('change', apply);
+        sortEl.addEventListener('change', apply);
+        apply();
+      }
+    </script>
+  </section>
+
+  <section class="container" style="padding-top: 28px;">
+    <NewsletterSignup />
+  </section>
+</BaseLayout>

@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
+import ContentCard from '../components/ContentCard.astro';
+import TopicTile from '../components/TopicTile.astro';
+
+import { sanityFetch } from '../lib/sanity';
+import { Q } from '../lib/queries';
+import type { ContentCardItem, Topic } from '../lib/types';
+
+const latest = await sanityFetch<ContentCardItem[]>(Q.latestContent).catch(() => []);
+
+// Enforce the home-page mix: 2 Media, 3 Insights, 1 Policy.
+const media = latest.filter((i) => i._type === 'mediaEpisode').slice(0, 2);
+const insights = latest.filter((i) => i._type === 'insight').slice(0, 3);
+const policy = latest.filter((i) => i._type === 'policyNote').slice(0, 1);
+const latestSix = [...media, ...insights, ...policy].slice(0, 6);
+
+const topics = await sanityFetch<Topic[]>(Q.allTopics).catch(() => []);
+const featuredTopicSlugs = [
+  'glp-1-population-health',
+  'obesity-metabolic-health',
+  'ultra-processed-foods',
+  'supplements-evidence',
+  'dietary-patterns-adherence',
+  'policy-population-outcomes'
+];
+const featuredTopics = topics.filter((t) => featuredTopicSlugs.includes(t.slug)).slice(0, 6);
+---
+<BaseLayout title="Michael Rashkin" description="Nutrition and population health, explained clearly. Evidence-first analysis, sources included, corrections public.">
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">
+      <h1>Nutrition and population health, explained clearly.</h1>
+      <p class="muted" style="margin-top: 0;">
+        Evidence-first analysis from a population health lens. Strong opinions are labeled. Sources are included. Corrections are public.
+      </p>
+
+      <div style="display:flex; gap: 12px; flex-wrap: wrap; margin-top: 18px;">
+        <a class="button primary" href="/topics">Explore Topics</a>
+        <a class="button" href="/media">Watch</a>
+        <a class="button" href="/start-here" style="background: transparent;">New here? Start here.</a>
+      </div>
+
+      <p class="small muted" style="margin-top: 18px;">
+        Michael Rashkin, DHSc, MS, CNS. Population health and nutrition analysis focused on real-world outcomes.
+        <a href="/about">About</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 28px;">
+    <div class="grid grid-3">
+      <div class="card">
+        <h3 style="margin-top:0;">How I think about nutrition at scale</h3>
+        <p class="muted" style="margin-bottom: 0;">
+          Most nutrition debates collapse because people mix personal anecdotes with population-level outcomes. Here I separate individual physiology from public health impact.
+        </p>
+        <div style="margin-top: 12px;"><a class="button" href="/start-here">Start Here</a></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">How I evaluate evidence</h3>
+        <p class="muted" style="margin-bottom: 0;">
+          I rank evidence by strength and relevance. I treat headlines skeptically. I separate association from causation.
+        </p>
+        <div style="margin-top: 12px;"><a class="button" href="/evidence/how-i-evaluate-evidence">Evidence standards</a></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;">How I handle controversy</h3>
+        <p class="muted" style="margin-bottom: 0;">
+          I will cover polarizing topics, including medications, industry influence, and policy. My goal is clarity, not outrage.
+        </p>
+        <div style="margin-top: 12px;"><a class="button" href="/evidence/editorial-policy">Editorial policy</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 34px;">
+    <div style="display:flex; justify-content: space-between; align-items: baseline; gap: 10px;">
+      <h2 style="margin:0;">Featured Topics</h2>
+      <a class="small" href="/topics">All topics</a>
+    </div>
+
+    <div class="grid grid-3" style="margin-top: 14px;">
+      {(featuredTopics.length ? featuredTopics : featuredTopicSlugs.map((slug) => ({
+        slug,
+        title: slug.replace(/-/g,' ').replace(/\b\w/g, (m) => m.toUpperCase()),
+        intro: ''
+      }))).map((t: any) => (
+        <TopicTile
+          href={`/topics/${t.slug}`}
+          title={t.title}
+          description={t.intro}
+          updatedAt={t.updatedAt}
+        />
+      ))}
+    </div>
+
+    <p class="small muted" style="margin-top: 10px;">
+      Tip: if Featured Topics tiles look “weird,” create those topics in Sanity using the suggested slugs.
+    </p>
+  </section>
+
+  <section class="container" style="padding-top: 34px;">
+    <h2 style="margin:0;">Latest</h2>
+    <div class="grid grid-3" style="margin-top: 14px;">
+      {latestSix.length ? latestSix.map((item) => (
+        <ContentCard
+          href={item._type === 'mediaEpisode' ? `/media/${item.slug}` : item._type === 'policyNote' ? `/policy/${item.slug}` : `/insights/${item.slug}`}
+          title={item.title}
+          contentType={item.contentType}
+          date={item.date}
+          excerpt={item.excerpt}
+        />
+      )) : (
+        <div class="card" style="grid-column: 1 / -1;">
+          <div style="font-weight: 900;">No content yet</div>
+          <p class="muted" style="margin: 8px 0 0;">
+            Add Topics, Media Episodes, Insights, or Policy Notes in Sanity Studio. The latest content will auto-populate here.
+          </p>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 34px;">
+    <h2 style="margin:0;">Most read</h2>
+    <div class="card" style="margin-top: 14px;">
+      <p class="muted" style="margin:0;">
+        MVP: implement “pinned items” via <span class="kbd">siteSettings</span> in Sanity.
+      </p>
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 34px;">
+    <NewsletterSignup />
+  </section>
+</BaseLayout>

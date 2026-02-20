@@ -1,0 +1,43 @@
+---
+const action = process.env.PUBLIC_NEWSLETTER_FORM_ACTION;
+const disabled = !action;
+const { title = 'Get one evidence-based brief per week.', body = 'No spam. Just clear analysis, sources, and updates when I change my mind.' } = Astro.props as {
+  title?: string;
+  body?: string;
+};
+---
+<section class="card newsletter">
+  <div class="header">{title}</div>
+  <div class="muted">{body}</div>
+
+  <form class="form" method="post" action={action || undefined}>
+    <input class="input" type="email" name="email" placeholder="you@example.com" required disabled={disabled} />
+    <button class="button primary" type="submit" disabled={disabled}>Subscribe</button>
+  </form>
+
+  {disabled ? (
+    <p class="small muted" style="margin-top: 10px;">
+      Set <span class="kbd">PUBLIC_NEWSLETTER_FORM_ACTION</span> in <span class="kbd">.env</span> to connect your provider.
+    </p>
+  ) : (
+    <p class="small muted" style="margin-top: 10px;">
+      By subscribing you agree to receive emails. Unsubscribe anytime.
+    </p>
+  )}
+</section>
+
+<style>
+  .newsletter {
+    background: #fbfbfc;
+  }
+  .header { font-weight: 900; margin-bottom: 6px; }
+  .form { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .input {
+    flex: 1;
+    min-width: 240px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 16px;
+  }
+</style>

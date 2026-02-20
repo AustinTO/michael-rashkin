@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TopicTile from '../../components/TopicTile.astro';
+
+import { sanityFetch } from '../../lib/sanity';
+import { Q } from '../../lib/queries';
+import type { Topic } from '../../lib/types';
+
+const topics = await sanityFetch<Topic[]>(Q.allTopics).catch(() => []);
+---
+<BaseLayout title="Topics — Michael Rashkin" description="Topic pillar pages that summarize what we know, what we don’t know, and how I interpret the tradeoffs.">
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">
+      <h1>Topics</h1>
+      <p class="muted">
+        Each topic page is a living “pillar” that summarizes what we know, what we don’t know, and how I interpret the tradeoffs.
+        Each page includes sources and an updated date.
+      </p>
+    </div>
+
+    <div class="grid grid-3" style="margin-top: 18px;">
+      {topics.length ? topics.map((t) => (
+        <TopicTile href={`/topics/${t.slug}`} title={t.title} description={t.intro} updatedAt={t.updatedAt || t.publishedAt} />
+      )) : (
+        <div class="card" style="grid-column: 1 / -1;">
+          <div style="font-weight: 900;">No topics yet</div>
+          <p class="muted" style="margin: 8px 0 0;">
+            Create <span class="kbd">topic</span> documents in Sanity Studio. Once created, Astro will statically generate each topic page.
+          </p>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

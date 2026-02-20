@@ -1,0 +1,36 @@
+---
+const { sources, title = 'Sources' } = Astro.props as {
+  sources?: Array<{ title: string; url: string; year?: number; sourceType?: string; note?: string }>;
+  title?: string;
+};
+
+if (!sources || sources.length === 0) {
+  // nothing
+}
+---
+{sources && sources.length ? (
+  <section class="card">
+    <div class="header">{title}</div>
+    <ol class="list">
+      {sources.map((s) => (
+        <li>
+          <div>
+            <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
+            <span class="meta">
+              {s.year ? ` • ${s.year}` : ''}{s.sourceType ? ` • ${s.sourceType}` : ''}
+            </span>
+          </div>
+          {s.note ? <div class="note muted small">{s.note}</div> : null}
+        </li>
+      ))}
+    </ol>
+  </section>
+) : null}
+
+<style>
+  .header { font-weight: 900; margin-bottom: 10px; }
+  .list { margin: 0; padding-left: 20px; }
+  .meta { color: var(--muted); font-size: 13px; font-weight: 600; }
+  .note { margin-top: 4px; }
+  li { margin: 10px 0; }
+</style>

@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+
+# Astro build/cache
+dist/
+.astro/
+
+# Sanity local build/cache
+.sanity/
+
+# local env
+.env
+.env.local
+.env.*.local
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# testing/coverage
+coverage/
+
+# editor/system
+.DS_Store
+.idea/
+.vscode/

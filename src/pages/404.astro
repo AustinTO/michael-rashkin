@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Not found — Michael Rashkin" description="Page not found" noindex={true}>
+  <section class="container" style="padding-top: 60px;">
+    <div class="prose">
+      <h1>Page not found</h1>
+      <p class="muted">The page you’re looking for doesn’t exist or may have moved.</p>
+
+      <div class="grid grid-2" style="margin-top: 18px; max-width: 720px;">
+        <a class="card" href="/start-here"><strong>Start Here</strong><div class="muted small">Orientation and how to use the site</div></a>
+        <a class="card" href="/topics"><strong>Topics</strong><div class="muted small">Pillar pages and evidence snapshots</div></a>
+        <a class="card" href="/media"><strong>Media</strong><div class="muted small">Episodes, transcripts, and sources</div></a>
+        <a class="card" href="/newsletter"><strong>Newsletter</strong><div class="muted small">Weekly evidence-based brief</div></a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,43 @@
+---
+import LabelPill from './LabelPill.astro';
+import { formatDate } from '../lib/dates';
+
+const {
+  href,
+  title,
+  contentType,
+  date,
+  excerpt
+} = Astro.props as {
+  href: string;
+  title: string;
+  contentType: string;
+  date?: string;
+  excerpt?: string;
+};
+---
+<a class="card card-link" href={href} data-type={contentType} data-date={date ?? ''}>
+  <div class="row">
+    <LabelPill label={contentType} />
+    {date ? <span class="muted small">{formatDate(date)}</span> : <span />}
+  </div>
+  <div class="title">{title}</div>
+  {excerpt ? <div class="muted small excerpt">{excerpt}</div> : null}
+</a>
+
+<style>
+  .card-link { display: block; color: inherit; }
+  .card-link:hover { text-decoration: none; border-color: #d7dbe0; }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .title {
+    margin-top: 10px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .excerpt { margin-top: 8px; }
+</style>

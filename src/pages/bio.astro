@@ -1,0 +1,12 @@
+---
+const dest = {
+  bio: '/about',
+  blog: '/insights',
+  videos: '/media',
+  podcast: '/media',
+  resources: '/topics',
+  press: '/about'
+}['bio'];
+
+return Astro.redirect(dest);
+---

@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Corrections — Michael Rashkin" description="Corrections policy and public corrections log.">
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">
+      <h1>Corrections</h1>
+      <p>
+        When a correction is made, I update the page and note:
+      </p>
+      <ul>
+        <li>the date of the change</li>
+        <li>what was changed</li>
+        <li>why it was changed</li>
+      </ul>
+      <p>
+        Major corrections will be noted at the top of the page.
+      </p>
+
+      <h2>Corrections log</h2>
+      <div class="card" style="overflow:auto;">
+        <table style="width:100%; border-collapse: collapse; min-width: 640px;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding: 10px; border-bottom: 1px solid var(--border);">Date</th>
+              <th style="text-align:left; padding: 10px; border-bottom: 1px solid var(--border);">Page</th>
+              <th style="text-align:left; padding: 10px; border-bottom: 1px solid var(--border);">What changed</th>
+              <th style="text-align:left; padding: 10px; border-bottom: 1px solid var(--border);">Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 10px; border-bottom: 1px solid var(--border);" class="muted">—</td>
+              <td style="padding: 10px; border-bottom: 1px solid var(--border);" class="muted">—</td>
+              <td style="padding: 10px; border-bottom: 1px solid var(--border);" class="muted">No corrections logged yet.</td>
+              <td style="padding: 10px; border-bottom: 1px solid var(--border);" class="muted">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr />
+      <p class="muted small">
+        MVP note: you can wire this table to Sanity using the included <span class="kbd">correctionEntry</span> schema.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

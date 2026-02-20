@@ -1,0 +1,23 @@
+---
+import UpdatedBadge from './UpdatedBadge.astro';
+const { href, title, description, updatedAt } = Astro.props as {
+  href: string;
+  title: string;
+  description?: string;
+  updatedAt?: string;
+};
+---
+<a class="card tile" href={href}>
+  <div class="top">
+    <div class="tile-title">{title}</div>
+    <UpdatedBadge date={updatedAt} />
+  </div>
+  {description ? <div class="muted small">{description}</div> : <div class="muted small">&nbsp;</div>}
+</a>
+
+<style>
+  .tile { display: block; color: inherit; }
+  .tile:hover { text-decoration: none; border-color: #d7dbe0; }
+  .top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .tile-title { font-weight: 850; letter-spacing: -0.01em; }
+</style>

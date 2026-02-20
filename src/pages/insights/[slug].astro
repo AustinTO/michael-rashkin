@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LabelPill from '../../components/LabelPill.astro';
+import UpdatedBadge from '../../components/UpdatedBadge.astro';
+import SourcesList from '../../components/SourcesList.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import ContentCard from '../../components/ContentCard.astro';
+
+import { sanityFetch } from '../../lib/sanity';
+import { Q } from '../../lib/queries';
+import { portableTextToHtml } from '../../lib/portableText';
+import type { ContentCardItem, Insight } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const items = await sanityFetch<Array<{ slug: string }>>(Q.allInsights).catch(() => []);
+  return items.map((i) => ({ params: { slug: i.slug } }));
+}
+
+const { slug } = Astro.params;
+const post = await sanityFetch<Insight>(Q.insightBySlug, { slug });
+
+const html = portableTextToHtml(post.body);
+const date = post.updatedAt || post.publishedAt;
+
+const relatedRaw = post.primaryTopic?._id
+  ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: post.primaryTopic._id }).catch(() => [])
+  : [];
+
+const related = relatedRaw.filter((i) => i._id !== post._id).slice(0, 6);
+---
+<BaseLayout title={`${post.title} — Michael Rashkin`} description={post.summaryBullets?.[0] || post.title}>
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">
+      <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
+        <LabelPill label={post.contentType} />
+        <UpdatedBadge date={date} prefix="Published" />
+        {post.primaryTopic ? <a class="pill" href={`/topics/${post.primaryTopic.slug}`}>{post.primaryTopic.title}</a> : null}
+      </div>
+
+      <h1 style="margin-top: 12px;">{post.title}</h1>
+
+      {post.summaryBullets?.length ? (
+        <ul>
+          {post.summaryBullets.map((b) => (<li>{b}</li>))}
+        </ul>
+      ) : null}
+
+      {html ? <div set:html={html} /> : <p class="muted">Add body content in Sanity.</p>}
+    </div>
+  </section>
+
+  <section class="container" style="padding-top: 18px;">
+    <div style="max-width: var(--content);">
+      <SourcesList sources={post.sources} />
+    </div>
+  </section>
+
+  {related.length ? (
+    <section class="container" style="padding-top: 28px;">
+      <h2 style="margin:0;">Related content</h2>
+      <div class="grid grid-3" style="margin-top: 14px;">
+        {related.map((item) => (
+          <ContentCard
+            href={item._type === 'mediaEpisode' ? `/media/${item.slug}` : item._type === 'policyNote' ? `/policy/${item.slug}` : `/insights/${item.slug}`}
+            title={item.title}
+            contentType={item.contentType}
+            date={item.date}
+            excerpt={item.excerpt}
+          />
+        ))}
+      </div>
+    </section>
+  ) : null}
+
+  <section class="container" style="padding-top: 28px;">
+    <NewsletterSignup />
+  </section>
+</BaseLayout>
