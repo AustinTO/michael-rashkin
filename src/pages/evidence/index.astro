@@ -1,47 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getContentPage } from '../../lib/cmsPage';
+
+const { page, html } = await getContentPage('/evidence');
 ---
-<BaseLayout title="Evidence — Michael Rashkin" description="How I evaluate evidence, label opinion, and correct mistakes.">
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>Evidence and standards</h1>
-      <p class="muted">
-        Nutrition arguments get messy when people mix data, ideology, and incentives.
-        This section explains how I evaluate evidence, how I label opinion, and how I correct mistakes.
-      </p>
-    </div>
-
-    <div class="grid grid-2" style="margin-top: 14px;">
-      <a class="card" href="/evidence/how-i-evaluate-evidence">
-        <h3 style="margin-top:0;">How I evaluate evidence</h3>
-        <p class="muted" style="margin-bottom:0;">Methods, standards, and how I handle uncertainty.</p>
-      </a>
-      <a class="card" href="/evidence/editorial-policy">
-        <h3 style="margin-top:0;">Editorial policy</h3>
-        <p class="muted" style="margin-bottom:0;">What I publish, evidence standards, opinion labeling, and corrections.</p>
-      </a>
-      <a class="card" href="/evidence/corrections-policy">
-        <h3 style="margin-top:0;">Corrections</h3>
-        <p class="muted" style="margin-bottom:0;">How corrections are recorded and displayed.</p>
-      </a>
-      <a class="card" href="/evidence/disclosures">
-        <h3 style="margin-top:0;">Disclosures</h3>
-        <p class="muted" style="margin-bottom:0;">Conflicts, sponsorships, and transparency.</p>
-      </a>
-
-      <a class="card" href="/evidence/definitions">
-        <h3 style="margin-top:0;">Definitions</h3>
-        <p class="muted" style="margin-bottom:0;">Glossary for common research and statistics terms.</p>
-      </a>
-      <a class="card" href="/evidence/reference-library">
-        <h3 style="margin-top:0;">Reference library</h3>
-        <p class="muted" style="margin-bottom:0;">Optional: searchable list of citations and notes.</p>
-      </a>
-    </div>
-
-    <style>
-      a.card { color: inherit; display: block; }
-      a.card:hover { text-decoration: none; border-color: #d7dbe0; }
-    </style>
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
   </section>
 </BaseLayout>

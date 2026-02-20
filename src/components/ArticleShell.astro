@@ -1,0 +1,52 @@
+---
+type MetaItem = { label: string; value: string };
+const {
+  title,
+  description,
+  meta = [],
+  corrections = []
+} = Astro.props as {
+  title: string;
+  description?: string;
+  meta?: MetaItem[];
+  corrections?: string[];
+};
+---
+<article class="article-wrap">
+  <header style="padding-top: 48px;">
+    {meta.length ? (
+      <div class="article-meta">
+        {meta.map((item) => (
+          <span><strong>{item.label}:</strong> {item.value}</span>
+        ))}
+      </div>
+    ) : null}
+    <h1 style="margin-bottom: 8px;">{title}</h1>
+    {description ? <p class="muted" style="margin-top: 0;">{description}</p> : null}
+    <button id="reading-toggle" class="button small" style="margin-top: 12px;" type="button">Toggle light reading mode</button>
+  </header>
+
+  <section>
+    <slot />
+  </section>
+
+  <section class="section-rule" style="margin-top: 54px;">
+    <h3 style="margin-bottom: 8px;">Corrections & Updates</h3>
+    {corrections.length ? (
+      <ul>
+        {corrections.map((note) => (<li class="muted">{note}</li>))}
+      </ul>
+    ) : (
+      <p class="muted">No corrections logged for this page.</p>
+    )}
+  </section>
+</article>
+
+<script>
+  const btn = document.getElementById('reading-toggle');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      document.body.classList.toggle('reading-light');
+    });
+  }
+</script>

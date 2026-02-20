@@ -1,12 +1,10 @@
 ---
 const nav = [
-  { label: 'Home', href: '/' },
-  { label: 'Start Here', href: '/start-here' },
   { label: 'Topics', href: '/topics' },
   { label: 'Evidence', href: '/evidence' },
   { label: 'Media', href: '/media' },
   { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' }
+  { label: 'Newsletter', href: '/newsletter' }
 ];
 ---
 <header class="site-header">
@@ -15,13 +13,9 @@ const nav = [
 
     <nav class="nav" aria-label="Primary">
       {nav.map((item) => (
-        <a class="nav-link" href={item.href}>{item.label}</a>
+        <a class="nav-link text-link" href={item.href}>{item.label}</a>
       ))}
     </nav>
-
-    <div class="cta">
-      <a class="button primary" href="/newsletter">Get the newsletter</a>
-    </div>
   </div>
 </header>
 
@@ -30,47 +24,43 @@ const nav = [
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(255,255,255,0.9);
+    background: var(--bg-surface);
     backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--rule);
   }
   .header-inner {
-    height: 64px;
+    min-height: 74px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 24px;
   }
   .brand {
-    font-weight: 800;
-    color: var(--text);
-    letter-spacing: -0.02em;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 1.26rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.01em;
   }
   .nav {
     display: flex;
-    gap: 14px;
+    gap: 22px;
     align-items: center;
-    margin-left: 10px;
+    margin-left: auto;
     flex: 1;
-    overflow: auto;
-    scrollbar-width: none;
+    justify-content: flex-end;
   }
-  .nav::-webkit-scrollbar { display: none; }
   .nav-link {
-    color: var(--muted);
-    font-weight: 600;
-    font-size: 14px;
-    padding: 8px 6px;
-    border-radius: 10px;
+    color: var(--text-primary);
+    opacity: 0.86;
+    font-size: 0.98rem;
     white-space: nowrap;
   }
   .nav-link:hover {
-    background: var(--bg-muted);
-    text-decoration: none;
-    color: var(--text);
+    opacity: 1;
   }
-  .cta { display: flex; }
-
-  @media (max-width: 880px) {
-    .cta { display: none; }
+  @media (max-width: 760px) {
+    .header-inner { min-height: 66px; }
+    .nav { gap: 14px; }
+    .nav-link { font-size: 0.87rem; }
   }
 </style>

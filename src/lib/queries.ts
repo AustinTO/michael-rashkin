@@ -1,4 +1,58 @@
 export const Q = {
+  contentPageByPath: `*[_type == "contentPage" && path == $path][0] {
+      _id,
+      _type,
+      title,
+      path,
+      description,
+      body
+    }`,
+
+  legalPageBySlug: `*[_type == "legalPage" && slug.current == $slug][0] {
+      _id,
+      _type,
+      title,
+      "slug": slug.current,
+      body
+    }`,
+
+  siteSettings: `*[_type == "siteSettings"][0] {
+      _id,
+      _type,
+      siteTitle,
+      featuredTopicsHeading,
+      latestHeading,
+      mostReadHeading,
+      heroActions,
+      credentialsLine,
+      credentialsLinkLabel,
+      credentialsLinkHref,
+      homePillars,
+      featuredTopics[]->{
+        _id,
+        _type,
+        title,
+        "slug": slug.current,
+        intro,
+        heroImage,
+        updatedAt,
+        publishedAt
+      },
+      pinnedContent[]->{
+        _id,
+        _type,
+        title,
+        "slug": slug.current,
+        "date": coalesce(updatedAt, publishedAt, _updatedAt),
+        "contentType": select(
+          _type == "mediaEpisode" => "Video",
+          _type == "policyNote" => "Policy Note",
+          _type == "insight" => contentType
+        ),
+        "excerpt": coalesce(shortDescription, array::join(summaryBullets[0...2], " • "), "")
+      }
+    }`,
+
   // Topics
   allTopics: `*[_type == "topic" && defined(slug.current)]
     | order(coalesce(updatedAt, publishedAt, _updatedAt) desc) {

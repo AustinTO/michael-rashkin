@@ -105,3 +105,36 @@ export type ContentCardItem = {
   excerpt?: string;
   topic?: { title: string; slug: string };
 };
+
+export type SiteSettings = {
+  _id: string;
+  _type: 'siteSettings';
+  siteTitle?: string;
+  featuredTopicsHeading?: string;
+  latestHeading?: string;
+  mostReadHeading?: string;
+  heroActions?: { label: string; href: string; variant?: 'primary' | 'default' }[];
+  credentialsLine?: string;
+  credentialsLinkLabel?: string;
+  credentialsLinkHref?: string;
+  homePillars?: { title: string; description?: string; buttonLabel?: string; buttonHref?: string }[];
+  featuredTopics?: Topic[];
+  pinnedContent?: ContentCardItem[];
+};
+
+export type ContentPage = {
+  _id: string;
+  _type: 'contentPage';
+  title: string;
+  path: string;
+  description?: string;
+  body: any[];
+};
+
+export type LegalPage = {
+  _id: string;
+  _type: 'legalPage';
+  title: string;
+  slug: string;
+  body: any[];
+};

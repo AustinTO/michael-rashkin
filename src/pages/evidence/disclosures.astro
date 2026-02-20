@@ -1,20 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
----
-<BaseLayout title="Disclosures — Michael Rashkin" description="Disclosures and conflicts of interest.">
-  <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>Disclosures</h1>
-      <p>
-        Disclosures and conflicts of interest are listed here. If content includes sponsorships, affiliate links, consulting relationships,
-        or other relevant relationships, they will be disclosed on the relevant page and summarized here.
-        If there are no relevant relationships at a given time, I will state that plainly.
-      </p>
+import { getContentPage } from '../../lib/cmsPage';
 
-      <hr />
-      <p class="muted small">
-        Starter: keep this page updated manually, or convert it into a CMS-managed page.
-      </p>
-    </div>
+const { page, html } = await getContentPage('/evidence/disclosures');
+---
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
   </section>
 </BaseLayout>

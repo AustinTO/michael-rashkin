@@ -4,6 +4,7 @@ import policyNote from './policyNote';
 import mediaEpisode from './mediaEpisode';
 import referenceEntry from './referenceEntry';
 import legalPage from './legalPage';
+import contentPage from './contentPage';
 import correctionEntry from './correctionEntry';
 import siteSettings from './siteSettings';
 
@@ -22,6 +23,7 @@ export const schemaTypes = [
   referenceEntry,
   correctionEntry,
   legalPage,
+  contentPage,
 
   // objects
   evidenceSnapshot,

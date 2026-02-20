@@ -1,14 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLegalPage } from '../lib/cmsPage';
+
+const { page, html } = await getLegalPage('disclaimer');
 ---
-<BaseLayout title="Disclaimer — Michael Rashkin" description="Educational disclaimer.">
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>Disclaimer</h1>
-      <p>
-        This site is for educational and informational purposes only. It is not medical advice and does not establish a clinician–patient relationship.
-        Do not use this information to diagnose or treat any condition. Talk with a qualified healthcare professional about your personal situation.
-      </p>
-    </div>
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
   </section>
 </BaseLayout>

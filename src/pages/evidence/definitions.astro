@@ -1,26 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getContentPage } from '../../lib/cmsPage';
+
+const { page, html } = await getContentPage('/evidence/definitions');
 ---
-<BaseLayout title="Definitions — Michael Rashkin" description="Glossary of research and statistics terms.">
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>Definitions</h1>
-      <p class="muted">A simple glossary to reduce confusion.</p>
-
-      <ul>
-        <li>Absolute vs relative risk</li>
-        <li>Confounding</li>
-        <li>Selection bias</li>
-        <li>External validity</li>
-        <li>NNT / NNH</li>
-        <li>Correlation vs causation</li>
-        <li>Surrogate endpoints</li>
-        <li>Publication bias</li>
-        <li>Dose-response</li>
-        <li>Intent-to-treat</li>
-      </ul>
-
-      <p class="muted small">Fill these in over time.</p>
-    </div>
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
   </section>
 </BaseLayout>

@@ -1,52 +1,37 @@
 ---
-const legal = [
-  { label: 'Newsletter', href: '/newsletter' },
-  { label: 'Corrections', href: '/evidence/corrections-policy' },
-  { label: 'Editorial Policy', href: '/evidence/editorial-policy' },
-  { label: 'Disclosures', href: '/evidence/disclosures' },
-  { label: 'Privacy Policy', href: '/privacy' },
-  { label: 'Terms', href: '/terms' },
-  { label: 'Cookie Policy', href: '/cookies' },
-  { label: 'Accessibility', href: '/accessibility' },
-  { label: 'Disclaimer', href: '/disclaimer' }
-];
-
-const utility = [
-  { label: 'Links', href: '/links' },
-  { label: 'Topics', href: '/topics' },
-  { label: 'Media', href: '/media' },
-  { label: 'Insights', href: '/insights' },
-  { label: 'Policy', href: '/policy' }
+const trust = [
+  { label: 'Disclosure policy', href: '/evidence/disclosures' },
+  { label: 'Evidence ranking methodology', href: '/evidence/how-i-evaluate-evidence' },
+  { label: 'Corrections log', href: '/evidence/corrections-policy' },
+  { label: 'Citation standards', href: '/evidence/reference-library' }
 ];
 ---
 <footer class="site-footer">
   <div class="container footer-inner">
     <div>
       <div class="footer-title">Michael Rashkin</div>
-      <p class="muted small" style="max-width: 48ch; margin-top: 8px;">
-        Evidence-first analysis on nutrition and population health.
-        Strong opinions are labeled. Sources are included. Corrections are public.
-      </p>
+      <p class="muted small" style="max-width: 48ch; margin-top: 8px;">Evidence-first analysis on nutrition and population health.</p>
       <p class="small muted" style="margin-top: 10px;">
         This site is for educational and informational purposes only. It is not medical advice.
       </p>
     </div>
 
     <div>
-      <div class="footer-title">Explore</div>
+      <div class="footer-title">Trust & Methods</div>
       <ul class="footer-list">
-        {utility.map((l) => (
-          <li><a href={l.href}>{l.label}</a></li>
+        {trust.map((l) => (
+          <li><a class="text-link" href={l.href}>{l.label}</a></li>
         ))}
       </ul>
     </div>
 
     <div>
-      <div class="footer-title">Legal & standards</div>
+      <div class="footer-title">Editorial Links</div>
       <ul class="footer-list">
-        {legal.map((l) => (
-          <li><a href={l.href}>{l.label}</a></li>
-        ))}
+        <li><a class="text-link" href="/topics">Topics</a></li>
+        <li><a class="text-link" href="/insights">Insights</a></li>
+        <li><a class="text-link" href="/media">Media</a></li>
+        <li><a class="text-link" href="/about">About</a></li>
       </ul>
     </div>
   </div>
@@ -58,18 +43,18 @@ const utility = [
 
 <style>
   .site-footer {
-    margin-top: 60px;
-    border-top: 1px solid var(--border);
-    background: var(--bg-muted);
+    margin-top: 100px;
+    border-top: 1px solid var(--rule);
+    background: var(--bg-primary);
   }
   .footer-inner {
-    padding-top: 28px;
-    padding-bottom: 10px;
+    padding-top: 34px;
+    padding-bottom: 18px;
     display: grid;
-    gap: 18px;
+    gap: 26px;
     grid-template-columns: 2fr 1fr 1fr;
   }
-  .footer-title { font-weight: 800; }
+  .footer-title { font-family: "Fraunces", Georgia, serif; }
   .footer-list {
     list-style: none;
     padding: 0;
@@ -77,8 +62,7 @@ const utility = [
     display: grid;
     gap: 8px;
   }
-  .footer-list a { color: var(--muted); font-weight: 600; font-size: 14px; }
-  .footer-list a:hover { color: var(--text); text-decoration: none; }
+  .footer-list a { color: var(--text-secondary); font-size: 0.92rem; }
 
   @media (max-width: 900px) {
     .footer-inner { grid-template-columns: 1fr; }

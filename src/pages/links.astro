@@ -1,20 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getContentPage } from '../lib/cmsPage';
+
+const { page, html } = await getContentPage('/links');
 ---
-<BaseLayout title="Links — Michael Rashkin" description="Link in bio landing page.">
-  <section class="container" style="padding-top: 38px; padding-bottom: 10px;">
-    <div class="prose" style="max-width: 520px;">
-      <h1>Michael Rashkin</h1>
-      <div class="grid" style="gap: 10px;">
-        <a class="button" href="/start-here">Start Here</a>
-        <a class="button" href="/topics/glp-1-population-health">GLP-1 and population health</a>
-        <a class="button" href="/topics">Topics</a>
-        <a class="button" href="/media">Media</a>
-        <a class="button" href="/newsletter">Newsletter</a>
-        <a class="button" href="/about">About</a>
-        <a class="button" href="/contact">Contact</a>
-      </div>
-      <p class="small muted" style="margin-top: 14px;">Use this as your “link in bio” destination.</p>
-    </div>
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
   </section>
 </BaseLayout>

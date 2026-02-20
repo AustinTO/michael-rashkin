@@ -1,24 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ContactForm from '../components/ContactForm.astro';
+import { getContentPage } from '../lib/cmsPage';
+
+const { page, html } = await getContentPage('/contact');
 ---
-<BaseLayout title="Contact — Michael Rashkin" description="Media, speaking, collaborations, corrections, and general messages.">
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>Contact</h1>
-      <p class="muted">For media inquiries, speaking requests, collaborations, corrections, or general messages.</p>
-
-      <div class="card" style="margin-top: 12px;">
-        <div class="small muted" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Media inquiries</div>
-        <div style="margin-top: 6px;">
-          Email: <a href="mailto:media@example.com">media@example.com</a>
-          <span class="muted small">(replace this with your real address)</span>
-        </div>
-      </div>
-
-      <div style="margin-top: 18px; max-width: var(--content);">
-        <ContactForm />
-      </div>
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
+    <div style="margin-top: 18px; max-width: var(--content);">
+      <ContactForm />
     </div>
   </section>
 </BaseLayout>

@@ -1,9 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import LabelPill from '../../components/LabelPill.astro';
-import UpdatedBadge from '../../components/UpdatedBadge.astro';
+import ArticleShell from '../../components/ArticleShell.astro';
 import SourcesList from '../../components/SourcesList.astro';
-import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import ContentCard from '../../components/ContentCard.astro';
 
 import { sanityFetch } from '../../lib/sanity';
@@ -29,41 +27,30 @@ const relatedRaw = post.primaryTopic?._id
 const related = relatedRaw.filter((i) => i._id !== post._id).slice(0, 6);
 ---
 <BaseLayout title={`${post.title} — Michael Rashkin`} description={post.summaryBullets?.[0] || post.title}>
-  <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
-        <LabelPill label="Policy Note" />
-        <UpdatedBadge date={date} prefix="Published" />
-        {post.primaryTopic ? <a class="pill" href={`/topics/${post.primaryTopic.slug}`}>{post.primaryTopic.title}</a> : null}
-      </div>
-
-      <h1 style="margin-top: 12px;">{post.title}</h1>
-
-      {post.policyLens ? (
-        <div class="card" style="margin: 10px 0 0;">
-          <div class="small muted" style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">Policy lens</div>
-          <div style="margin-top: 6px;">{post.policyLens}</div>
-        </div>
-      ) : null}
-
+  <section class="container">
+    <ArticleShell
+      title={post.title}
+      description={post.policyLens || post.summaryBullets?.[0]}
+      meta={[
+        { label: 'Updated', value: date ? new Date(date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Not set' },
+        { label: 'Evidence tier', value: 'Tier 2 dominant' }
+      ]}
+      corrections={date ? [`${new Date(date).toISOString().slice(0, 10)}: Last content update published.`] : []}
+    >
       {post.summaryBullets?.length ? (
         <ul>
           {post.summaryBullets.map((b) => (<li>{b}</li>))}
         </ul>
       ) : null}
-
-      {html ? <div set:html={html} /> : <p class="muted">Add body content in Sanity.</p>}
-    </div>
-  </section>
-
-  <section class="container" style="padding-top: 18px;">
-    <div style="max-width: var(--content);">
-      <SourcesList sources={post.sources} />
-    </div>
+      {html ? <div class="prose" set:html={html} /> : <p class="muted">Add body content in Sanity.</p>}
+      <div style="margin-top: 24px;">
+        <SourcesList sources={post.sources} />
+      </div>
+    </ArticleShell>
   </section>
 
   {related.length ? (
-    <section class="container" style="padding-top: 28px;">
+    <section class="container section-rule">
       <h2 style="margin:0;">Related content</h2>
       <div class="grid grid-3" style="margin-top: 14px;">
         {related.map((item) => (
@@ -78,8 +65,4 @@ const related = relatedRaw.filter((i) => i._id !== post._id).slice(0, 6);
       </div>
     </section>
   ) : null}
-
-  <section class="container" style="padding-top: 28px;">
-    <NewsletterSignup />
-  </section>
 </BaseLayout>

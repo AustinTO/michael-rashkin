@@ -1,11 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLegalPage } from '../lib/cmsPage';
+
+const { page, html } = await getLegalPage('cookies');
 ---
-<BaseLayout title="Cookie policy — Michael Rashkin" description="Cookie policy.">
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>Cookie Policy</h1>
-      <p class="muted">Starter placeholder. Add your real cookie policy here.</p>
-    </div>
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
   </section>
 </BaseLayout>

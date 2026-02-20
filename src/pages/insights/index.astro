@@ -4,32 +4,20 @@ import ContentCard from '../../components/ContentCard.astro';
 
 import { sanityFetch } from '../../lib/sanity';
 import { Q } from '../../lib/queries';
+import { getContentPage } from '../../lib/cmsPage';
 import type { ContentCardItem } from '../../lib/types';
 
+const { page, html } = await getContentPage('/insights');
 const items = await sanityFetch<ContentCardItem[]>(Q.allInsights).catch(() => []);
 ---
-<BaseLayout title="Insights — Michael Rashkin" description="Written analysis: evidence briefs, deep dives, myth checks, and clearly labeled opinion.">
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>Insights</h1>
-      <p class="muted">Written analysis. Evidence briefs, deep dives, myth checks, and clearly labeled opinion.</p>
-    </div>
-
-    <div class="card" style="margin-top: 14px;">
-      <div class="small muted">
-        MVP note: add filters (topic/type) later. This page already supports the content types + pills.
-      </div>
-    </div>
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
 
     <div class="grid grid-3" style="margin-top: 14px;" id="insights-list">
-      {items.length ? items.map((item) => (
+      {items.map((item) => (
         <ContentCard href={`/insights/${item.slug}`} title={item.title} contentType={item.contentType} date={item.date} excerpt={item.excerpt} />
-      )) : (
-        <div class="card" style="grid-column: 1 / -1;">
-          <div style="font-weight: 900;">No insights yet</div>
-          <p class="muted" style="margin: 8px 0 0;">Create <span class="kbd">insight</span> documents in Sanity Studio.</p>
-        </div>
-      )}
+      ))}
     </div>
   </section>
 </BaseLayout>

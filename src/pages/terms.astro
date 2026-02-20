@@ -1,11 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLegalPage } from '../lib/cmsPage';
+
+const { page, html } = await getLegalPage('terms');
 ---
-<BaseLayout title="Terms — Michael Rashkin" description="Terms of use.">
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>Terms</h1>
-      <p class="muted">Starter placeholder. Add your real terms here.</p>
-    </div>
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
   </section>
 </BaseLayout>

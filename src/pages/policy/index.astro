@@ -4,32 +4,20 @@ import ContentCard from '../../components/ContentCard.astro';
 
 import { sanityFetch } from '../../lib/sanity';
 import { Q } from '../../lib/queries';
+import { getContentPage } from '../../lib/cmsPage';
 import type { ContentCardItem } from '../../lib/types';
 
+const { page, html } = await getContentPage('/policy');
 const items = await sanityFetch<ContentCardItem[]>(Q.allPolicyNotes).catch(() => []);
 ---
-<BaseLayout title="Policy — Michael Rashkin" description="Politics and policy as they relate to population health outcomes. Facts are cited. Values and tradeoffs stated plainly.">
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>Policy</h1>
-      <p class="muted">
-        This is where I discuss politics and policy as they relate to population health outcomes.
-        Facts are cited. Values and tradeoffs are stated plainly.
-      </p>
-      <p class="small muted">
-        Purpose: keeps main nutrition content from being perceived as a politics feed while still giving full freedom.
-      </p>
-    </div>
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
 
     <div class="grid grid-3" style="margin-top: 14px;">
-      {items.length ? items.map((item) => (
+      {items.map((item) => (
         <ContentCard href={`/policy/${item.slug}`} title={item.title} contentType={item.contentType} date={item.date} excerpt={item.excerpt} />
-      )) : (
-        <div class="card" style="grid-column: 1 / -1;">
-          <div style="font-weight: 900;">No policy notes yet</div>
-          <p class="muted" style="margin: 8px 0 0;">Create <span class="kbd">policyNote</span> documents in Sanity Studio.</p>
-        </div>
-      )}
+      ))}
     </div>
   </section>
 </BaseLayout>

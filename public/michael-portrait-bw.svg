@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 900" role="img" aria-label="Portrait placeholder">
+  <rect width="700" height="900" fill="#11161c"/>
+  <ellipse cx="360" cy="350" rx="170" ry="220" fill="#c7cbd1"/>
+  <rect x="170" y="520" width="380" height="320" rx="170" fill="#dfe3e8"/>
+  <ellipse cx="300" cy="340" rx="30" ry="18" fill="#0f1217"/>
+  <ellipse cx="420" cy="340" rx="30" ry="18" fill="#0f1217"/>
+  <path d="M300 450c28 36 72 36 100 0" stroke="#0f1217" stroke-width="12" fill="none" stroke-linecap="round"/>
+</svg>

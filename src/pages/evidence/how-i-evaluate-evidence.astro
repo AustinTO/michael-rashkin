@@ -1,48 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getContentPage } from '../../lib/cmsPage';
+
+const { page, html } = await getContentPage('/evidence/how-i-evaluate-evidence');
 ---
-<BaseLayout title="How I evaluate evidence — Michael Rashkin" description="Evidence hierarchy, how I handle uncertainty, and how I separate population health from anecdotes.">
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
-      <h1>How I evaluate evidence</h1>
-
-      <h2>My hierarchy in plain language</h2>
-      <ul>
-        <li><strong>Stronger evidence beats louder confidence.</strong></li>
-        <li>RCTs, meta-analyses, guidelines, high-quality observational, mechanistic.</li>
-      </ul>
-
-      <h2>What I watch for in nutrition research</h2>
-      <ul>
-        <li>Measurement error</li>
-        <li>Confounding</li>
-        <li>Healthy user bias</li>
-        <li>Adherence and dropout</li>
-        <li>Real-world feasibility</li>
-        <li>Absolute risk vs relative risk</li>
-      </ul>
-
-      <h2>How I separate population health from individual anecdotes</h2>
-      <ul>
-        <li>“A diet can ‘work’ for a person and fail at scale.”</li>
-        <li>Focus on adherence, access, cost, environment.</li>
-      </ul>
-
-      <h2>How I change my mind</h2>
-      <p>
-        Here’s what would change my position: better trials, better outcomes data, consistent replication, or a clear adverse signal.
-      </p>
-
-      <h2>How I handle uncertainty</h2>
-      <ul>
-        <li>Use “Unclear” when appropriate.</li>
-        <li>Explain why.</li>
-      </ul>
-
-      <hr />
-      <p class="muted small">
-        Note: this page is static in the starter. You can move it into Sanity later if you want full CMS control.
-      </p>
-    </div>
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
   </section>
 </BaseLayout>

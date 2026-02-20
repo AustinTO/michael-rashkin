@@ -1,55 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NewsletterSignup from '../components/NewsletterSignup.astro';
+import { getContentPage } from '../lib/cmsPage';
+
+const { page, html } = await getContentPage('/start-here');
 ---
-<BaseLayout title="Start here — Michael Rashkin" description="Start here: what this site is, how to read it, and what you will and won’t find.">
-  <section class="container" style="padding-top: 38px; padding-bottom: 10px;">
-    <div class="prose">
-      <h1>Start here</h1>
-      <p>
-        This site is an evidence-forward guide to nutrition and population health. I separate what we know from what we think.
-        I label opinion. I cite sources. I post corrections.
-      </p>
-
-      <h2>Who this is for</h2>
-      <ul>
-        <li>People who want clear nutrition explanations without ideology.</li>
-        <li>Clinicians and students who want a population-level lens.</li>
-        <li>Anyone trying to sort signal from noise in nutrition news.</li>
-        <li>People who want to understand how incentives and policy shape health.</li>
-      </ul>
-
-      <h2>What you will and won’t find here</h2>
-      <h3>You will find</h3>
-      <ul>
-        <li>Topic pages that summarize the evidence and the tradeoffs.</li>
-        <li>Short videos with a permanent home and sources.</li>
-        <li>Long-form writing with citations.</li>
-        <li>Policy analysis that separates facts from values.</li>
-      </ul>
-
-      <h3>You will not find</h3>
-      <ul>
-        <li>Personalized medical advice.</li>
-        <li>“Miracle” claims.</li>
-        <li>Hidden sponsorships without disclosure.</li>
-        <li>Certainty where the evidence is genuinely unclear.</li>
-      </ul>
-
-      <h2>How to read the site</h2>
-      <p>
-        Start with a topic pillar page. Then read or watch one supporting piece. If you disagree, check the Evidence section before assuming bad faith.
-      </p>
-
-      <h2>The three best starting points</h2>
-      <ol>
-        <li><a href="/topics/glp-1-population-health">Topic: GLP-1 medications and population health</a></li>
-        <li><a href="/media">Video: My evidence rules in 10 minutes</a> (add a specific episode when ready)</li>
-        <li><a href="/insights">Brief: Ultra-processed foods: what people get wrong</a> (add a specific post when ready)</li>
-      </ol>
-    </div>
+<BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
+  <section class="container" style="padding-top: 38px;">
+    <div class="prose">{html ? <div set:html={html} /> : null}</div>
   </section>
-
   <section class="container" style="padding-top: 10px;">
     <NewsletterSignup />
   </section>
