@@ -18,6 +18,9 @@ export default defineConfig({
   output: 'server',
   adapter: node({ mode: 'standalone' }),
   vite: {
+    optimizeDeps: {
+      exclude: ['@sanity/vision', 'sanity', '@sanity/presentation']
+    },
     define: {
       'import.meta.env.PUBLIC_SANITY_PROJECT_ID': JSON.stringify(projectId),
       'import.meta.env.PUBLIC_SANITY_DATASET': JSON.stringify(dataset),
