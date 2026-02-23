@@ -19,6 +19,16 @@ export default defineConfig({
   adapter: node({ mode: 'standalone' }),
   vite: {
     optimizeDeps: {
+      include: [
+        'react',
+        'react/jsx-runtime',
+        'react-dom',
+        'react-dom/client',
+        'react/compiler-runtime',
+        'react-is',
+        'styled-components',
+        'lodash/startCase.js'
+      ],
       exclude: ['@sanity/vision', 'sanity', '@sanity/presentation']
     },
     define: {
