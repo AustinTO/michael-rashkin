@@ -4,3 +4,4 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  PUBLIC_SANITY_VISUAL_EDITING_ENABLED = "true"
