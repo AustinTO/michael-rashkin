@@ -1,5 +1,5 @@
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
+import netlify from '@astrojs/netlify';
 import react from '@astrojs/react';
 import dotenv from 'dotenv';
 import sanity from '@sanity/astro';
@@ -26,7 +26,7 @@ if (!dataset) throw new Error('Missing PUBLIC_SANITY_DATASET (or SANITY_DATASET 
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'http://localhost:4321',
   output: 'server',
-  adapter: node({ mode: 'standalone' }),
+  adapter: netlify(),
   vite: {
     optimizeDeps: {
       include: [
