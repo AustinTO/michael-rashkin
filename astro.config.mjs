@@ -23,12 +23,21 @@ const apiVersion =
 const studioProjectId = projectId;
 const studioDataset = dataset;
 const studioApiVersion = apiVersion;
+const publicSiteUrl = process.env.PUBLIC_SITE_URL;
+const publicSiteIsLocalhost =
+  !!publicSiteUrl && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(publicSiteUrl);
+const siteUrl =
+  process.env.SANITY_STUDIO_PREVIEW_ORIGIN ||
+  process.env.DEPLOY_PRIME_URL ||
+  process.env.URL ||
+  (publicSiteIsLocalhost ? undefined : publicSiteUrl) ||
+  'http://localhost:4321';
 
 if (!projectId) throw new Error('Missing PUBLIC_SANITY_PROJECT_ID (or SANITY_PROJECT_ID / SANITY_STUDIO_PROJECT_ID)');
 if (!dataset) throw new Error('Missing PUBLIC_SANITY_DATASET (or SANITY_DATASET / SANITY_STUDIO_DATASET)');
 
 export default defineConfig({
-  site: process.env.PUBLIC_SITE_URL || 'http://localhost:4321',
+  site: siteUrl,
   output: 'server',
   adapter: netlify(),
   vite: {

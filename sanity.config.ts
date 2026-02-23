@@ -26,13 +26,18 @@ const apiVersion =
   '2025-01-01';
 const isDev = env.NODE_ENV !== 'production';
 const netlifySiteUrl = env.DEPLOY_PRIME_URL || env.URL;
+const netlifyBranchUrl =
+  env.BRANCH && env.SITE_NAME ? `https://${env.BRANCH}--${env.SITE_NAME}.netlify.app` : undefined;
 const publicSiteUrl = env.PUBLIC_SITE_URL;
 const publicSiteIsLocalhost = !!publicSiteUrl && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(publicSiteUrl);
 const previewOrigin =
   env.SANITY_STUDIO_PREVIEW_ORIGIN ||
   (isDev
     ? 'http://localhost:4321'
-    : netlifySiteUrl || (publicSiteIsLocalhost ? undefined : publicSiteUrl) || 'http://localhost:4321');
+    : netlifySiteUrl ||
+      netlifyBranchUrl ||
+      (publicSiteIsLocalhost ? undefined : publicSiteUrl) ||
+      'http://localhost:4321');
 
 if (!projectId) throw new Error('Missing SANITY_STUDIO_PROJECT_ID, PUBLIC_SANITY_PROJECT_ID, or SANITY_PROJECT_ID');
 if (!dataset) throw new Error('Missing SANITY_STUDIO_DATASET, PUBLIC_SANITY_DATASET, or SANITY_DATASET');
