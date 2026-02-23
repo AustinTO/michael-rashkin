@@ -29,8 +29,8 @@ const previewOrigin =
   env.SANITY_STUDIO_PREVIEW_ORIGIN ||
   (isDev ? 'http://localhost:4321' : env.PUBLIC_SITE_URL || 'http://localhost:4321');
 
-if (!projectId) throw new Error('Missing SANITY_STUDIO_PROJECT_ID (or SANITY_PROJECT_ID)');
-if (!dataset) throw new Error('Missing SANITY_STUDIO_DATASET (or SANITY_DATASET)');
+if (!projectId) throw new Error('Missing SANITY_STUDIO_PROJECT_ID, PUBLIC_SANITY_PROJECT_ID, or SANITY_PROJECT_ID');
+if (!dataset) throw new Error('Missing SANITY_STUDIO_DATASET, PUBLIC_SANITY_DATASET, or SANITY_DATASET');
 
 export default defineConfig({
   name: 'default',

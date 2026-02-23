@@ -17,9 +17,9 @@ cp .env.example .env
 
 2. Fill in at least:
 
-- `SANITY_PROJECT_ID`
-- `SANITY_DATASET`
-- `SANITY_API_VERSION`
+- `PUBLIC_SANITY_PROJECT_ID`
+- `PUBLIC_SANITY_DATASET`
+- `PUBLIC_SANITY_API_VERSION`
 
 If your dataset is private, also set:
 
@@ -30,6 +30,10 @@ Optional Studio-specific overrides:
 - `SANITY_STUDIO_PROJECT_ID`
 - `SANITY_STUDIO_DATASET`
 - `SANITY_STUDIO_API_VERSION`
+
+Notes:
+- `PUBLIC_SANITY_*` values are public identifiers and can be exposed to the browser.
+- Do not mark `PUBLIC_SANITY_PROJECT_ID`/`PUBLIC_SANITY_DATASET`/`PUBLIC_SANITY_API_VERSION` as secrets in Netlify.
 
 ## 3) Install
 
