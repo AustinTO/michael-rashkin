@@ -20,6 +20,10 @@ const apiVersion =
   process.env.SANITY_API_VERSION ||
   '2025-01-01';
 
+const studioProjectId = projectId;
+const studioDataset = dataset;
+const studioApiVersion = apiVersion;
+
 if (!projectId) throw new Error('Missing PUBLIC_SANITY_PROJECT_ID (or SANITY_PROJECT_ID / SANITY_STUDIO_PROJECT_ID)');
 if (!dataset) throw new Error('Missing PUBLIC_SANITY_DATASET (or SANITY_DATASET / SANITY_STUDIO_DATASET)');
 
@@ -28,6 +32,14 @@ export default defineConfig({
   output: 'server',
   adapter: netlify(),
   vite: {
+    define: {
+      'import.meta.env.SANITY_STUDIO_PROJECT_ID': JSON.stringify(studioProjectId),
+      'import.meta.env.SANITY_STUDIO_DATASET': JSON.stringify(studioDataset),
+      'import.meta.env.SANITY_STUDIO_API_VERSION': JSON.stringify(studioApiVersion),
+      'import.meta.env.SANITY_PROJECT_ID': JSON.stringify(studioProjectId),
+      'import.meta.env.SANITY_DATASET': JSON.stringify(studioDataset),
+      'import.meta.env.SANITY_API_VERSION': JSON.stringify(studioApiVersion)
+    },
     optimizeDeps: {
       include: [
         'react',
