@@ -23,6 +23,18 @@ export default defineType({
       rows: 2
     }),
     defineField({
+      name: 'heroImage',
+      title: 'Hero image',
+      type: 'image',
+      options: { hotspot: true }
+    }),
+    defineField({
+      name: 'heroImageAlt',
+      title: 'Hero image alt text',
+      type: 'string',
+      description: 'Describe the image for screen readers.'
+    }),
+    defineField({
       name: 'body',
       title: 'Body',
       type: 'array',

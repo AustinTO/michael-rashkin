@@ -5,6 +5,8 @@ export const Q = {
       title,
       path,
       description,
+      heroImage,
+      heroImageAlt,
       body
     }`,
 

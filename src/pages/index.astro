@@ -7,6 +7,7 @@ import TopicTile from '../components/TopicTile.astro';
 import { sanityFetch } from '../lib/sanity';
 import { Q } from '../lib/queries';
 import { getContentPage } from '../lib/cmsPage';
+import { urlFor } from '../lib/image';
 import type { ContentCardItem, SiteSettings, Topic } from '../lib/types';
 
 const { page, html } = await getContentPage('/');
@@ -22,6 +23,8 @@ const featuredTopics: Topic[] = settings?.featuredTopics || [];
 const pinned = settings?.pinnedContent || [];
 const heroActions = settings?.heroActions || [];
 const homePillars = settings?.homePillars || [];
+const heroImageUrl = page?.heroImage ? urlFor(page.heroImage).width(1600).quality(82).url() : null;
+const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
 ---
 <BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 56px;">
@@ -48,6 +51,16 @@ const homePillars = settings?.homePillars || [];
         </p>
       ) : null}
     </div>
+    {heroImageUrl ? (
+      <div style="margin-top: 24px;">
+        <img
+          src={heroImageUrl}
+          alt={heroImageAlt}
+          loading="lazy"
+          style="width:100%; max-width: 980px; height:auto; display:block; border-radius: 8px;"
+        />
+      </div>
+    ) : null}
   </section>
 
   {homePillars.length ? (

@@ -128,6 +128,8 @@ export type ContentPage = {
   title: string;
   path: string;
   description?: string;
+  heroImage?: any;
+  heroImageAlt?: string;
   body: any[];
 };
 
