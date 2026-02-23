@@ -1,6 +1,7 @@
 import { defineConfig } from 'sanity';
 import { deskTool } from 'sanity/desk';
 import { visionTool } from '@sanity/vision';
+import { presentationTool } from 'sanity/presentation';
 import { schemaTypes } from './schemaTypes';
 
 const env = (
@@ -34,7 +35,15 @@ export default defineConfig({
   dataset,
   apiVersion,
   basePath: '/studio',
-  plugins: [deskTool(), visionTool()],
+  plugins: [
+    deskTool(),
+    visionTool(),
+    presentationTool({
+      previewUrl: {
+        origin: env.PUBLIC_SITE_URL || 'http://localhost:4321'
+      }
+    })
+  ],
   schema: {
     types: schemaTypes
   }
