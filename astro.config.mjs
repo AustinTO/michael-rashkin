@@ -29,6 +29,7 @@ export default defineConfig({
         'styled-components',
         'lodash/startCase.js'
       ],
+      needsInterop: ['void-elements'],
       exclude: ['@sanity/vision', 'sanity', '@sanity/presentation']
     },
     define: {
