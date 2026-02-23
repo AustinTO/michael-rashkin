@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { VisualEditing } from '@sanity/astro/visual-editing';
 import '../styles/global.css';
 
 const {
@@ -12,6 +13,8 @@ const {
 
 const site = (process.env.PUBLIC_SITE_URL || 'http://localhost:4321').replace(/\/$/, '');
 const canonical = `${site}${canonicalPath}`;
+const visualEditingEnabled =
+  import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true' || import.meta.env.DEV;
 ---
 <html lang="en">
   <head>
@@ -35,5 +38,6 @@ const canonical = `${site}${canonicalPath}`;
       <slot />
     </main>
     <Footer />
+    <VisualEditing enabled={visualEditingEnabled} zIndex={1000} />
   </body>
 </html>

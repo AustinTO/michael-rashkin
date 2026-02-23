@@ -27,10 +27,11 @@ export default defineConfig({
         'react/compiler-runtime',
         'react-is',
         'styled-components',
-        'lodash/startCase.js'
+        'lodash/startCase.js',
+        'sanity',
+        '@sanity/vision'
       ],
-      needsInterop: ['void-elements'],
-      exclude: ['@sanity/vision', 'sanity', '@sanity/presentation']
+      needsInterop: ['void-elements']
     },
     define: {
       'import.meta.env.PUBLIC_SANITY_PROJECT_ID': JSON.stringify(projectId),
@@ -47,7 +48,10 @@ export default defineConfig({
       projectId,
       dataset,
       apiVersion,
-      studioBasePath: '/studio'
+      studioBasePath: '/studio',
+      stega: {
+        studioUrl: '/studio'
+      }
     })
   ]
 });
