@@ -17,6 +17,16 @@ export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'http://localhost:4321',
   output: 'server',
   adapter: node({ mode: 'standalone' }),
+  vite: {
+    define: {
+      'import.meta.env.PUBLIC_SANITY_PROJECT_ID': JSON.stringify(projectId),
+      'import.meta.env.PUBLIC_SANITY_DATASET': JSON.stringify(dataset),
+      'import.meta.env.PUBLIC_SANITY_API_VERSION': JSON.stringify(apiVersion),
+      'import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID': JSON.stringify(projectId),
+      'import.meta.env.PUBLIC_SANITY_STUDIO_DATASET': JSON.stringify(dataset),
+      'import.meta.env.PUBLIC_SANITY_STUDIO_API_VERSION': JSON.stringify(apiVersion)
+    }
+  },
   integrations: [
     react(),
     sanity({

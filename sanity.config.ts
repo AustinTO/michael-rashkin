@@ -4,9 +4,7 @@ import { visionTool } from '@sanity/vision';
 import { schemaTypes } from './schemaTypes';
 
 const env = (
-  typeof process !== 'undefined' && process.env
-    ? process.env
-    : (import.meta.env ?? {})
+  import.meta.env ?? (typeof process !== 'undefined' ? process.env : {})
 ) as Record<string, string | undefined>;
 
 const projectId =
