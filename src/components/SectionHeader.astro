@@ -1,0 +1,9 @@
+---
+const { title, label, accent = false } = Astro.props as {
+  title?: string;
+  label?: string;
+  accent?: boolean;
+};
+---
+{label ? <p class="editorial-label">{label}</p> : null}
+{title ? <h2 class:list={['section-title', accent && 'section-accent']}>{title}</h2> : null}

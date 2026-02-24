@@ -4,8 +4,7 @@ const nav = [
   { label: 'Topics', href: '/topics' },
   { label: 'Evidence', href: '/evidence' },
   { label: 'Media', href: '/media' },
-  { label: 'About', href: '/about' },
-  { label: 'Newsletter', href: '/newsletter' }
+  { label: 'About', href: '/about' }
 ];
 ---
 <header class="site-header">
@@ -23,64 +22,106 @@ const nav = [
         </a>
       ))}
     </nav>
+    <a class="btn btn-primary header-cta" href="/newsletter">Newsletter</a>
   </div>
 </header>
+
+<script>
+  const header = document.querySelector('.site-header');
+  const onScroll = () => {
+    if (!header) return;
+    header.classList.toggle('is-scrolled', window.scrollY > 6);
+  };
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>
 
 <style>
   .site-header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(15, 18, 23, 0.75);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--rule);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+    background: rgba(11, 17, 26, 0.55);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  }
+  .site-header.is-scrolled {
+    background: rgba(11, 17, 26, 0.78);
+    border-bottom-color: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 18px 36px -28px var(--shadow);
   }
   .header-inner {
-    min-height: 74px;
+    min-height: 80px;
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 32px;
   }
   .brand {
-    font-family: "Fraunces", Georgia, serif;
-    font-size: 1.26rem;
-    font-weight: 600;
+    font-family: "Inter Tight", "Inter", ui-sans-serif, system-ui, sans-serif;
+    font-size: 1.18rem;
+    font-weight: 700;
     color: var(--text-primary);
-    letter-spacing: 0.01em;
+    letter-spacing: -0.015em;
   }
   .nav {
     display: flex;
-    gap: 22px;
+    gap: 8px;
     align-items: center;
     margin-left: auto;
-    flex: 1;
     justify-content: flex-end;
   }
   .nav-link {
     color: var(--text-secondary);
-    font-size: 0.94rem;
+    font-size: 0.9rem;
+    font-weight: 500;
     white-space: nowrap;
     text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: color 180ms ease, border-color 180ms ease;
+    position: relative;
+    padding: 8px 10px;
+    border-radius: 10px;
+    transition: color 200ms ease, background-color 200ms ease;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 5px;
+    height: 2px;
+    transform-origin: left;
+    transform: scaleX(0);
+    background: var(--accent);
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
   }
   .nav-link:hover {
     color: var(--text-primary);
-    border-color: rgba(230, 234, 240, 0.35);
+    background: var(--surface-1);
   }
   .nav-link.is-active {
     color: var(--text-primary);
-    border-color: var(--accent);
+  }
+  .nav-link.is-active::after,
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+  .header-cta {
+    margin-left: 10px;
+    padding-inline: 16px;
+    font-size: 0.88rem;
+    min-height: 40px;
   }
   @media (max-width: 760px) {
-    .header-inner { min-height: 66px; }
+    .header-inner { min-height: 72px; gap: 14px; }
     .nav {
-      gap: 14px;
+      gap: 2px;
       overflow-x: auto;
       scrollbar-width: none;
+      margin-left: 0;
+      flex: 1;
     }
     .nav::-webkit-scrollbar { display: none; }
-    .nav-link { font-size: 0.87rem; }
+    .nav-link { font-size: 0.84rem; padding: 8px; }
+    .header-cta { padding-inline: 12px; font-size: 0.82rem; }
   }
 </style>

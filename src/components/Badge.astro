@@ -1,0 +1,9 @@
+---
+const { variant = 'default', class: className = '' } = Astro.props as {
+  variant?: 'default' | 'accent';
+  class?: string;
+};
+---
+<span class:list={['badge', variant === 'accent' && 'badge-accent', className]}>
+  <slot />
+</span>

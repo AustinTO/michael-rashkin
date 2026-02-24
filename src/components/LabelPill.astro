@@ -1,4 +1,5 @@
 ---
+import Badge from './Badge.astro';
 const { label } = Astro.props as { label: string };
 ---
-<span class="pill">{label}</span>
+<Badge>{label}</Badge>

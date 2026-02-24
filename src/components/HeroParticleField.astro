@@ -1,0 +1,144 @@
+<canvas class="hero-particle-field" aria-hidden="true"></canvas>
+
+<script>
+  const canvases = document.querySelectorAll('canvas.hero-particle-field:not([data-initialized])');
+  canvases.forEach((canvas) => {
+    if (!(canvas instanceof HTMLCanvasElement)) return;
+    canvas.dataset.initialized = 'true';
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let w = 0;
+    let h = 0;
+    let raf = 0;
+    let last = 0;
+
+    const ACCENT = '20,184,166';
+    const LINE_ALPHA = 0.12;
+    const MAX_DIST = 92;
+    const BRIGHT_COUNT = 4;
+
+    /** @type {{x:number,y:number,vx:number,vy:number,r:number,bright:boolean,phase:number}[]} */
+    let particles = [];
+
+    const init = () => {
+      const rect = canvas.getBoundingClientRect();
+      w = Math.max(1, Math.floor(rect.width));
+      h = Math.max(1, Math.floor(rect.height));
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const target = Math.max(30, Math.min(38, Math.floor((w * h) / 32000)));
+      particles = Array.from({ length: target }, (_, i) => {
+        const a = Math.random() * Math.PI * 2;
+        const base = 2.2 + Math.random() * 1.5; // px/sec
+        const bright = i < BRIGHT_COUNT;
+        const speed = bright ? base * 0.55 : base;
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed,
+          r: bright ? 2 : 1.6 + Math.random() * 0.4,
+          bright,
+          phase: Math.random() * Math.PI * 2
+        };
+      });
+    };
+
+    const wrap = (p) => {
+      if (p.x < -2) p.x = w + 2;
+      else if (p.x > w + 2) p.x = -2;
+      if (p.y < -2) p.y = h + 2;
+      else if (p.y > h + 2) p.y = -2;
+    };
+
+    const draw = (dt, ts) => {
+      ctx.clearRect(0, 0, w, h);
+      for (let i = 0; i < particles.length; i++) {
+        const a = particles[i];
+        if (!reduceMotion) {
+          a.x += a.vx * dt;
+          a.y += a.vy * dt;
+          wrap(a);
+        }
+        let links = 0;
+        for (let j = i + 1; j < particles.length; j++) {
+          if (links > 1) break;
+          const b = particles[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 > MAX_DIST * MAX_DIST) continue;
+          const t = 1 - Math.sqrt(d2) / MAX_DIST;
+          ctx.strokeStyle = `rgba(${ACCENT},${(LINE_ALPHA * t).toFixed(3)})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+          links++;
+        }
+      }
+      for (const p of particles) {
+        const pulse = 0.88 + Math.sin(ts * 0.00015 + p.phase) * 0.12;
+        if (p.bright) {
+          ctx.shadowBlur = 9;
+          ctx.shadowColor = `rgba(${ACCENT},0.18)`;
+          ctx.fillStyle = `rgba(${ACCENT},${(0.54 * pulse).toFixed(3)})`;
+        } else {
+          ctx.shadowBlur = 0;
+          ctx.fillStyle = `rgba(${ACCENT},${(0.33 * pulse).toFixed(3)})`;
+        }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+    };
+
+    const frame = (ts) => {
+      if (!last) last = ts;
+      const dt = Math.min(0.05, (ts - last) / 1000);
+      last = ts;
+      draw(dt, ts);
+      raf = requestAnimationFrame(frame);
+    };
+
+    init();
+    draw(0.016, performance.now());
+    if (!reduceMotion) raf = requestAnimationFrame(frame);
+
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      last = 0;
+      init();
+      draw(0.016, performance.now());
+      if (!reduceMotion) raf = requestAnimationFrame(frame);
+    });
+    ro.observe(canvas);
+
+    window.addEventListener(
+      'pagehide',
+      () => {
+        cancelAnimationFrame(raf);
+        ro.disconnect();
+      },
+      { once: true }
+    );
+  });
+</script>
+
+<style>
+  .hero-particle-field {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>

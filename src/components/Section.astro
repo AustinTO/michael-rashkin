@@ -1,18 +1,11 @@
 ---
+import Divider from './Divider.astro';
+import SectionHeader from './SectionHeader.astro';
+
 const { title, label, divider = true, accent = false } = Astro.props;
 ---
 <section class:list={['container', divider && 'section-rule']}>
-  {label ? <div class="editorial-label">{label}</div> : null}
-  {title ? <h2 class:list={['section-title', accent && 'section-accent']}>{title}</h2> : null}
+  {divider ? <Divider /> : null}
+  <SectionHeader title={title} label={label} accent={accent} />
   <slot />
 </section>
-
-<style>
-  .section-title {
-    margin: 0 0 18px;
-  }
-  .section-accent {
-    border-left: 2px solid var(--accent);
-    padding-left: 14px;
-  }
-</style>

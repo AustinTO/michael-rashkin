@@ -1,0 +1,12 @@
+---
+const { href, class: className = '' } = Astro.props as { href?: string; class?: string };
+---
+{href ? (
+  <a class:list={['card', 'card-panel', className]} href={href}>
+    <slot />
+  </a>
+) : (
+  <article class:list={['card', 'card-panel', className]}>
+    <slot />
+  </article>
+)}

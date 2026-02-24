@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Section from '../components/Section.astro';
 import ContentCard from '../components/ContentCard.astro';
 import TopicTile from '../components/TopicTile.astro';
+import Button from '../components/Button.astro';
 
 import { sanityFetch } from '../lib/sanity';
 import { Q } from '../lib/queries';
@@ -27,47 +28,71 @@ const heroImageUrl = page?.heroImage ? urlFor(page.heroImage).width(1600).qualit
 const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
 ---
 <BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
-  <section class="container" style="padding-top: 56px;">
-    <div class="prose">
-      {html ? <div set:html={html} /> : null}
-
-      {heroActions.length ? (
-        <div style="display:flex; gap: 14px; flex-wrap: wrap; margin-top: 18px;">
-          {heroActions.map((action) => (
-            <a class="text-link" href={action.href}>→ {action.label}</a>
-          ))}
-        </div>
-      ) : null}
-
-      {settings?.credentialsLine ? (
-        <p class="small muted" style="margin-top: 18px;">
-          {settings.credentialsLine}
-          {settings.credentialsLinkLabel && settings.credentialsLinkHref ? (
-            <>
-              {' '}
-              <a class="text-link" href={settings.credentialsLinkHref}>{settings.credentialsLinkLabel}</a>
-            </>
-          ) : null}
-        </p>
-      ) : null}
-    </div>
-    {heroImageUrl ? (
-      <div style="margin-top: 24px;">
-        <img
-          src={heroImageUrl}
-          alt={heroImageAlt}
-          loading="lazy"
-          style="width:100%; max-width: 980px; height:auto; display:block; border-radius: 8px;"
-        />
+  <section class="hero">
+    <div class="hero-shell">
+      <div class="hero-bg" aria-hidden="true">
+        <video
+          class="hero-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster="/hero-poster.avif"
+        >
+          <source src="/hero.webm" type="video/webm" />
+          <source src="/hero.mp4" type="video/mp4" />
+        </video>
+        <div class="hero-overlay"></div>
       </div>
-    ) : null}
+      <div class="hero-bottom-fade"></div>
+
+      <div class="hero-content container">
+        <div class="prose hero-copy reveal">
+          {html ? <div set:html={html} /> : null}
+
+          {heroActions.length ? (
+            <div class="hero-actions">
+              {heroActions.map((action, idx) => (
+                <Button href={action.href} variant={idx === 0 ? 'primary' : idx === 1 ? 'ghost' : 'link'}>
+                  {action.label}
+                </Button>
+              ))}
+            </div>
+          ) : null}
+
+          {settings?.credentialsLine ? (
+            <p class="small muted" style="margin-top: 18px;">
+              {settings.credentialsLine}
+              {settings.credentialsLinkLabel && settings.credentialsLinkHref ? (
+                <>
+                  {' '}
+                  <a class="text-link" href={settings.credentialsLinkHref}>{settings.credentialsLinkLabel}</a>
+                </>
+              ) : null}
+            </p>
+          ) : null}
+        </div>
+        {heroImageUrl ? (
+          <div class="hero-image-wrap reveal">
+            <img
+              src={heroImageUrl}
+              alt={heroImageAlt}
+              loading="lazy"
+              class="hero-image"
+            />
+          </div>
+        ) : null}
+        <div class="hero-divider" aria-hidden="true"></div>
+      </div>
+    </div>
   </section>
 
   {homePillars.length ? (
     <Section divider={true}>
-      <div class="grid grid-3">
+      <div class="grid grid-3 stagger">
         {homePillars.map((pillar) => (
-          <div class="card">
+          <div class="card card-panel reveal">
             <h3 style="margin-top:0;">{pillar.title}</h3>
             {pillar.description ? <p class="muted" style="margin-bottom:0;">{pillar.description}</p> : null}
             {pillar.buttonLabel && pillar.buttonHref ? (
@@ -79,16 +104,16 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     </Section>
   ) : null}
 
-  <Section title={settings?.featuredTopicsHeading || 'Featured Topics'} divider={true}>
-    <div class="grid grid-3" style="margin-top: 14px;">
+  <Section title={settings?.featuredTopicsHeading || 'Featured Topics'} label={settings?.featuredTopicsHeading || 'Featured Topics'} divider={true}>
+    <div class="grid grid-3 featured-grid stagger" style="margin-top: 14px;">
       {featuredTopics.map((t) => (
         <TopicTile href={`/topics/${t.slug}`} title={t.title} description={t.intro} updatedAt={t.updatedAt} />
       ))}
     </div>
   </Section>
 
-  <Section title={settings?.latestHeading || 'Latest'} divider={true}>
-    <div class="grid grid-3" style="margin-top: 14px;">
+  <Section title={settings?.latestHeading || 'Latest'} label={settings?.latestHeading || 'Latest'} divider={true}>
+    <div class="grid grid-3 stagger" style="margin-top: 14px;">
       {latestSix.map((item) => (
         <ContentCard
           href={item._type === 'mediaEpisode' ? `/media/${item.slug}` : item._type === 'policyNote' ? `/policy/${item.slug}` : `/insights/${item.slug}`}
@@ -101,8 +126,8 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     </div>
   </Section>
 
-  <Section title={settings?.mostReadHeading || 'Most read'} divider={true}>
-    <div class="grid grid-3" style="margin-top: 14px;">
+  <Section title={settings?.mostReadHeading || 'Most read'} label={settings?.mostReadHeading || 'Most read'} divider={true}>
+    <div class="grid grid-3 stagger" style="margin-top: 14px;">
       {pinned.map((item) => (
         <ContentCard
           href={item._type === 'mediaEpisode' ? `/media/${item.slug}` : item._type === 'policyNote' ? `/policy/${item.slug}` : `/insights/${item.slug}`}
@@ -115,3 +140,261 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     </div>
   </Section>
 </BaseLayout>
+
+<script>
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const hero = document.querySelector('.hero');
+  const heroShell = document.querySelector('.hero-shell');
+
+  let clipRaf = 0;
+  const updateHeroClose = () => {
+    if (!(hero instanceof HTMLElement) || !(heroShell instanceof HTMLElement)) return;
+    const rect = hero.getBoundingClientRect();
+    const total = Math.max(1, hero.offsetHeight - heroShell.offsetHeight);
+    const progressed = Math.min(total, Math.max(0, -rect.top));
+    const p = progressed / total;
+    const closePct = Math.min(100, p * 100);
+    heroShell.style.clipPath = `inset(0 0 ${closePct.toFixed(3)}% 0)`;
+  };
+
+  const onClipScroll = () => {
+    if (clipRaf) return;
+    clipRaf = requestAnimationFrame(() => {
+      updateHeroClose();
+      clipRaf = 0;
+    });
+  };
+
+  const applyMotionPreference = () => {
+    document.querySelectorAll('.hero-video').forEach((node) => {
+      if (!(node instanceof HTMLVideoElement)) return;
+      if (reducedMotion.matches) {
+        node.pause();
+        node.removeAttribute('autoplay');
+        node.removeAttribute('loop');
+        node.currentTime = 0;
+        node.load();
+      }
+    });
+  };
+  applyMotionPreference();
+  reducedMotion.addEventListener?.('change', applyMotionPreference);
+  window.addEventListener('scroll', onClipScroll, { passive: true });
+  window.addEventListener('resize', onClipScroll, { passive: true });
+  onClipScroll();
+</script>
+
+<style>
+.hero {
+  padding-top: 0;
+  padding-bottom: 1rem;
+  margin-bottom: 0;
+  min-height: calc(clamp(390px, 51vh, 615px) + 10vh);
+}
+.hero-shell {
+  position: relative;
+  position: sticky;
+  top: 80px;
+  overflow: hidden;
+  min-height: clamp(390px, 51vh, 615px);
+  background: #0b111a;
+  will-change: clip-path;
+}
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.38;
+  filter: blur(1.4px);
+  -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.98) 20%,
+      rgba(0, 0, 0, 1) 34%,
+      rgba(0, 0, 0, 1) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 66%,
+      rgba(0, 0, 0, 0.95) 82%,
+      transparent 100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.98) 20%,
+      rgba(0, 0, 0, 1) 34%,
+      rgba(0, 0, 0, 1) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 1) 66%,
+      rgba(0, 0, 0, 0.95) 82%,
+      transparent 100%
+    );
+  mask-composite: intersect;
+}
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      radial-gradient(
+        circle at -10% 52%,
+        #0b111a 0%,
+        #0b111a 48%,
+        rgba(11, 17, 26, 0.96) 66%,
+        rgba(11, 17, 26, 0.62) 84%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        #0b111a 0%,
+        #0b111a 34%,
+        rgba(11, 17, 26, 0.96) 50%,
+        rgba(11, 17, 26, 0.62) 74%,
+        rgba(11, 17, 26, 0.28) 90%,
+        transparent 100%
+      );
+  }
+  .hero-bottom-fade {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 64%,
+      rgba(11,17,26,0.38) 84%,
+      rgba(11,17,26,0.6) 100%
+    );
+  }
+  .hero-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        to right,
+        #0b111a 0%,
+        rgba(11, 17, 26, 0.98) 16%,
+        rgba(11, 17, 26, 0.8) 30%,
+        transparent 42%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 68%,
+        rgba(11, 17, 26, 0.4) 88%,
+        rgba(11, 17, 26, 0.62) 100%
+      );
+  }
+  .hero-content {
+    position: relative;
+    z-index: 4;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .hero-copy {
+    max-width: 860px;
+    position: relative;
+    isolation: isolate;
+  }
+  .hero-copy::before {
+    content: "";
+    position: absolute;
+    inset: -16px -20px;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: linear-gradient(
+      to bottom,
+      rgba(232, 237, 243, 0.34) 1px,
+      transparent 1px
+    );
+    background-size: 100% 48px;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.92) 14%,
+      rgba(0, 0, 0, 0.92) 86%,
+      transparent 100%
+    );
+  }
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .hero-image-wrap {
+    margin-top: 28px;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-image {
+    width: 100%;
+    max-width: 1040px;
+    height: auto;
+    display: block;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+  .hero-divider {
+    margin-top: 40px;
+    height: 1px;
+    width: min(1040px, 100%);
+    background: linear-gradient(90deg, transparent 0%, var(--accent-glow) 50%, transparent 100%);
+    position: relative;
+    z-index: 2;
+  }
+  .featured-grid > *:first-child {
+    grid-column: span 2;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      var(--depth-2);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .featured-grid > *:first-child:hover {
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        var(--depth-3);
+    }
+  }
+  @media (max-width: 960px) {
+    .hero {
+      padding-top: 0;
+      margin-bottom: 0;
+      min-height: calc(clamp(345px, 56vh, 525px) + 8vh);
+    }
+    .hero-shell {
+      top: 72px;
+      min-height: clamp(345px, 56vh, 525px);
+    }
+    .featured-grid > *:first-child {
+      grid-column: span 1;
+    }
+  }
+
+  .hero + .container.section-rule {
+    margin-top: 0;
+  }
+  .hero + .container.section-rule .section-divider {
+    display: none;
+  }
+</style>

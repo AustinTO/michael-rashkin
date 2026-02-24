@@ -1,4 +1,5 @@
 ---
+import Card from './Card.astro';
 import LabelPill from './LabelPill.astro';
 import { formatDate } from '../lib/dates';
 
@@ -16,28 +17,39 @@ const {
   excerpt?: string;
 };
 ---
-<a class="card card-link" href={href} data-type={contentType} data-date={date ?? ''}>
+<Card class="card-link reveal" href={href}>
   <div class="row">
     <LabelPill label={contentType} />
-    {date ? <span class="muted small">{formatDate(date)}</span> : <span />}
+    {date ? <span class="meta-badge">{formatDate(date)}</span> : <span />}
   </div>
   <div class="title">{title}</div>
   {excerpt ? <div class="muted small excerpt">{excerpt}</div> : null}
-</a>
+</Card>
 
 <style>
   .card-link { display: block; color: inherit; }
-  .card-link:hover { text-decoration: none; border-color: #d7dbe0; }
+  .card-link:hover { text-decoration: none; }
   .row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
   }
   .title {
-    margin-top: 10px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    margin-top: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.28;
+    letter-spacing: -0.015em;
   }
-  .excerpt { margin-top: 8px; }
+  .excerpt { margin-top: 10px; line-height: 1.55; }
+  .meta-badge {
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    border-radius: 999px;
+    font-size: 0.74rem;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
 </style>
