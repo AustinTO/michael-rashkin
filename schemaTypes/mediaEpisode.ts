@@ -14,6 +14,18 @@ export default defineType({
       validation: (Rule) => Rule.required()
     }),
     defineField({
+      name: 'heroImage',
+      title: 'Hero image (optional)',
+      type: 'image',
+      options: { hotspot: true }
+    }),
+    defineField({
+      name: 'heroImageAlt',
+      title: 'Hero image alt text (optional)',
+      type: 'string',
+      description: 'Describe the image for screen readers.'
+    }),
+    defineField({
       name: 'platform',
       title: 'Platform',
       type: 'string',
@@ -90,7 +102,8 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
-      subtitle: 'platform'
+      subtitle: 'platform',
+      media: 'heroImage'
     }
   }
 });

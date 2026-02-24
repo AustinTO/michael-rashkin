@@ -80,6 +80,8 @@ export type MediaEpisode = {
   _type: 'mediaEpisode';
   title: string;
   slug: string;
+  heroImage?: any;
+  heroImageAlt?: string;
   platform: MediaPlatform;
   embedUrl: string;
   shortDescription?: string;
