@@ -9,6 +9,7 @@ import ContentCard from '../../components/ContentCard.astro';
 import { sanityFetch } from '../../lib/sanity';
 import { Q } from '../../lib/queries';
 import { portableTextToHtml } from '../../lib/portableText';
+import { normalizeEmbedUrl } from '../../lib/embed';
 import type { ContentCardItem, MediaEpisode } from '../../lib/types';
 
 export async function getStaticPaths() {
@@ -21,6 +22,7 @@ const ep = await sanityFetch<MediaEpisode>(Q.mediaBySlug, { slug });
 
 const transcriptHtml = portableTextToHtml(ep.transcript);
 const date = ep.updatedAt || ep.publishedAt;
+const embedUrl = normalizeEmbedUrl(ep.embedUrl);
 
 const relatedRaw = ep.primaryTopic?._id
   ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: ep.primaryTopic._id }).catch(() => [])
@@ -42,7 +44,7 @@ const related = relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6);
 
       <div class="embed" style="margin-top: 14px;">
         <iframe
-          src={ep.embedUrl}
+          src={embedUrl}
           title={ep.title}
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

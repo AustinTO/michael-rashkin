@@ -43,7 +43,7 @@ export default defineType({
       name: 'embedUrl',
       title: 'Embed URL',
       type: 'url',
-      description: 'Use an embeddable URL (e.g., YouTube embed link).',
+      description: 'Use an embeddable URL. For YouTube, paste any YouTube URL (watch/share/embed/shorts); it will be normalized automatically on the site.',
       validation: (Rule) => Rule.required().uri({ scheme: ['http', 'https'] })
     }),
     defineField({
