@@ -197,7 +197,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
   top: 80px;
   overflow: hidden;
   min-height: clamp(390px, 51vh, 615px);
-  background: #0b111a;
+  background: var(--surface-2);
   will-change: clip-path;
 }
   .hero-bg {
@@ -212,8 +212,8 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.38;
-  filter: blur(1.4px);
+  opacity: 0.28;
+  filter: blur(1px);
   -webkit-mask-image: linear-gradient(
       to right,
       transparent 0%,
@@ -252,19 +252,19 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     background:
       radial-gradient(
         circle at -10% 52%,
-        #0b111a 0%,
-        #0b111a 56%,
-        rgba(11, 17, 26, 0.94) 72%,
-        rgba(11, 17, 26, 0.6) 88%,
+        rgba(247, 244, 239, 0.98) 0%,
+        rgba(247, 244, 239, 0.94) 56%,
+        rgba(247, 244, 239, 0.78) 72%,
+        rgba(247, 244, 239, 0.46) 88%,
         transparent 100%
       ),
       linear-gradient(
         to right,
-        #0b111a 0%,
-        #0b111a 34%,
-        rgba(11, 17, 26, 0.86) 48%,
-        rgba(11, 17, 26, 0.48) 70%,
-        rgba(11, 17, 26, 0.2) 88%,
+        rgba(247, 244, 239, 1) 0%,
+        rgba(247, 244, 239, 0.96) 34%,
+        rgba(247, 244, 239, 0.86) 48%,
+        rgba(247, 244, 239, 0.52) 70%,
+        rgba(247, 244, 239, 0.22) 88%,
         transparent 100%
       );
   }
@@ -277,8 +277,8 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
       to bottom,
       transparent 0%,
       transparent 64%,
-      rgba(11,17,26,0.38) 84%,
-      rgba(11,17,26,0.6) 100%
+      rgba(194, 92, 18, 0.08) 84%,
+      rgba(194, 92, 18, 0.16) 100%
     );
   }
   .hero-shell::before {
@@ -290,17 +290,17 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     background:
       linear-gradient(
         to right,
-        #0b111a 0%,
-        rgba(11, 17, 26, 0.92) 18%,
-        rgba(11, 17, 26, 0.62) 30%,
+        rgba(247, 244, 239, 0.98) 0%,
+        rgba(247, 244, 239, 0.92) 18%,
+        rgba(247, 244, 239, 0.62) 30%,
         transparent 44%
       ),
       linear-gradient(
         to bottom,
         transparent 0%,
         transparent 68%,
-        rgba(11, 17, 26, 0.4) 88%,
-        rgba(11, 17, 26, 0.62) 100%
+        rgba(194, 92, 18, 0.06) 88%,
+        rgba(194, 92, 18, 0.14) 100%
       );
   }
   .hero-content {
@@ -323,7 +323,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     opacity: 0.05;
     background-image: linear-gradient(
       to bottom,
-      rgba(232, 237, 243, 0.34) 1px,
+      rgba(194, 92, 18, 0.2) 1px,
       transparent 1px
     );
     background-size: 100% 48px;
@@ -365,15 +365,11 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
   }
   .featured-grid > *:first-child {
     grid-column: span 2;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      var(--depth-2);
+      box-shadow: var(--depth-2);
   }
   @media (hover: hover) and (pointer: fine) {
     .featured-grid > *:first-child:hover {
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.07),
-        var(--depth-3);
+      box-shadow: var(--depth-3);
     }
   }
   @media (max-width: 960px) {
@@ -396,9 +392,9 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     .hero-overlay {
       background: linear-gradient(
         to right,
-        rgba(11, 17, 26, 0.68) 0%,
-        rgba(11, 17, 26, 0.42) 42%,
-        rgba(11, 17, 26, 0.2) 72%,
+        rgba(247, 244, 239, 0.7) 0%,
+        rgba(247, 244, 239, 0.45) 42%,
+        rgba(247, 244, 239, 0.24) 72%,
         transparent 100%
       );
     }
@@ -407,8 +403,8 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
         to bottom,
         transparent 0%,
         transparent 72%,
-        rgba(11, 17, 26, 0.28) 88%,
-        rgba(11, 17, 26, 0.46) 100%
+        rgba(194, 92, 18, 0.08) 88%,
+        rgba(194, 92, 18, 0.18) 100%
       );
     }
     .hero-bottom-fade {
@@ -416,8 +412,8 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
         to bottom,
         transparent 0%,
         transparent 74%,
-        rgba(11,17,26,0.22) 90%,
-        rgba(11,17,26,0.42) 100%
+        rgba(194, 92, 18, 0.08) 90%,
+        rgba(194, 92, 18, 0.16) 100%
       );
     }
     .featured-grid > *:first-child {
