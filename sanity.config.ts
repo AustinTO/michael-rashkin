@@ -4,9 +4,10 @@ import { visionTool } from '@sanity/vision';
 import { presentationTool } from 'sanity/presentation';
 import { schemaTypes } from './schemaTypes';
 
-const env = (
-  import.meta.env ?? (typeof process !== 'undefined' ? process.env : {})
-) as Record<string, string | undefined>;
+const env = {
+  ...(typeof process !== 'undefined' ? (process.env as Record<string, string | undefined>) : {}),
+  ...((import.meta.env ?? {}) as Record<string, string | undefined>)
+} as Record<string, string | undefined>;
 
 const projectId =
   env.SANITY_STUDIO_PROJECT_ID ||
@@ -40,7 +41,7 @@ const previewOrigin =
     : netlifySiteUrl ||
       netlifyBranchUrl ||
       (publicSiteIsLocalhost ? undefined : publicSiteUrl) ||
-      'http://localhost:4321');
+      'https://michaelrashkin.netlify.app');
 const presentationAllowOrigins = Array.from(
   new Set([
     ...(isDev ? ['http://localhost:4321'] : []),
