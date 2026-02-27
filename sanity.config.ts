@@ -9,6 +9,19 @@ const env = {
   ...((import.meta.env ?? {}) as Record<string, string | undefined>)
 } as Record<string, string | undefined>;
 
+function toAbsoluteOrigin(value?: string): string | undefined {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  const withScheme = /^[a-z][a-z\d+\-.]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  try {
+    const url = new URL(withScheme);
+    return `${url.protocol}//${url.host}`;
+  } catch {
+    return undefined;
+  }
+}
+
 const projectId =
   env.SANITY_STUDIO_PROJECT_ID ||
   env.SANITY_PROJECT_ID ||
@@ -26,12 +39,13 @@ const apiVersion =
   env.PUBLIC_SANITY_API_VERSION ||
   '2025-01-01';
 const isDev = env.NODE_ENV !== 'production';
-const netlifySiteUrl = env.DEPLOY_PRIME_URL || env.URL;
-const netlifyBranchUrl =
-  env.BRANCH && env.SITE_NAME ? `https://${env.BRANCH}--${env.SITE_NAME}.netlify.app` : undefined;
-const publicSiteUrl = env.PUBLIC_SITE_URL;
+const netlifySiteUrl = toAbsoluteOrigin(env.DEPLOY_PRIME_URL || env.URL);
+const netlifyBranchUrl = toAbsoluteOrigin(
+  env.BRANCH && env.SITE_NAME ? `https://${env.BRANCH}--${env.SITE_NAME}.netlify.app` : undefined
+);
+const publicSiteUrl = toAbsoluteOrigin(env.PUBLIC_SITE_URL);
 const publicSiteIsLocalhost = !!publicSiteUrl && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(publicSiteUrl);
-const configuredPreviewOrigin = env.SANITY_STUDIO_PREVIEW_ORIGIN;
+const configuredPreviewOrigin = toAbsoluteOrigin(env.SANITY_STUDIO_PREVIEW_ORIGIN);
 const configuredPreviewIsLocalhost =
   !!configuredPreviewOrigin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configuredPreviewOrigin);
 const previewOrigin =
