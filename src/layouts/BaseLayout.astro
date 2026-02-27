@@ -13,8 +13,12 @@ const {
 
 const site = (process.env.PUBLIC_SITE_URL || 'http://localhost:4321').replace(/\/$/, '');
 const canonical = `${site}${canonicalPath}`;
-const visualEditingEnabled =
+const visualEditingConfigured =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true' || import.meta.env.DEV;
+const secFetchDest = Astro.request.headers.get('sec-fetch-dest');
+const referer = Astro.request.headers.get('referer') || '';
+const isPresentationRequest = secFetchDest === 'iframe' || /\/studio(\/|$)/i.test(referer);
+const visualEditingEnabled = visualEditingConfigured && isPresentationRequest;
 ---
 <html lang="en">
   <head>
