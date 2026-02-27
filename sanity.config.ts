@@ -30,19 +30,27 @@ const netlifyBranchUrl =
   env.BRANCH && env.SITE_NAME ? `https://${env.BRANCH}--${env.SITE_NAME}.netlify.app` : undefined;
 const publicSiteUrl = env.PUBLIC_SITE_URL;
 const publicSiteIsLocalhost = !!publicSiteUrl && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(publicSiteUrl);
+const configuredPreviewOrigin = env.SANITY_STUDIO_PREVIEW_ORIGIN;
+const configuredPreviewIsLocalhost =
+  !!configuredPreviewOrigin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configuredPreviewOrigin);
 const previewOrigin =
-  env.SANITY_STUDIO_PREVIEW_ORIGIN ||
+  (isDev || !configuredPreviewIsLocalhost ? configuredPreviewOrigin : undefined) ||
   (isDev
     ? 'http://localhost:4321'
     : netlifySiteUrl ||
       netlifyBranchUrl ||
       (publicSiteIsLocalhost ? undefined : publicSiteUrl) ||
       'http://localhost:4321');
-const presentationAllowOrigins = [
-  'http://localhost:4321',
-  'https://michaelrashkin.netlify.app',
-  /^https:\/\/[a-z0-9-]+--michaelrashkin\.netlify\.app$/i
-];
+const presentationAllowOrigins = Array.from(
+  new Set([
+    ...(isDev ? ['http://localhost:4321'] : []),
+    'https://michaelrashkin.netlify.app',
+    netlifySiteUrl,
+    netlifyBranchUrl,
+    !publicSiteIsLocalhost ? publicSiteUrl : undefined,
+    previewOrigin
+  ].filter((v): v is string => !!v))
+);
 
 if (!projectId) throw new Error('Missing SANITY_STUDIO_PROJECT_ID, PUBLIC_SANITY_PROJECT_ID, or SANITY_PROJECT_ID');
 if (!dataset) throw new Error('Missing SANITY_STUDIO_DATASET, PUBLIC_SANITY_DATASET, or SANITY_DATASET');
