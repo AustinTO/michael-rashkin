@@ -38,6 +38,11 @@ const previewOrigin =
       netlifyBranchUrl ||
       (publicSiteIsLocalhost ? undefined : publicSiteUrl) ||
       'http://localhost:4321');
+const presentationAllowOrigins = [
+  'http://localhost:4321',
+  'https://michaelrashkin.netlify.app',
+  /^https:\/\/[a-z0-9-]+--michaelrashkin\.netlify\.app$/i
+];
 
 if (!projectId) throw new Error('Missing SANITY_STUDIO_PROJECT_ID, PUBLIC_SANITY_PROJECT_ID, or SANITY_PROJECT_ID');
 if (!dataset) throw new Error('Missing SANITY_STUDIO_DATASET, PUBLIC_SANITY_DATASET, or SANITY_DATASET');
@@ -52,6 +57,7 @@ export default defineConfig({
     deskTool(),
     visionTool(),
     presentationTool({
+      allowOrigins: presentationAllowOrigins,
       previewUrl: {
         origin: previewOrigin
       }
