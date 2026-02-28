@@ -38,7 +38,9 @@ const apiVersion =
   env.PUBLIC_SANITY_STUDIO_API_VERSION ||
   env.PUBLIC_SANITY_API_VERSION ||
   '2025-01-01';
-const isDev = env.NODE_ENV !== 'production';
+const netlifyContext = env.CONTEXT;
+const viteDev = Boolean((import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV);
+const isDev = netlifyContext ? netlifyContext === 'dev' : env.NODE_ENV === 'development' || viteDev;
 const netlifySiteUrl = toAbsoluteOrigin(env.DEPLOY_PRIME_URL || env.URL);
 const netlifyBranchUrl = toAbsoluteOrigin(
   env.BRANCH && env.SITE_NAME ? `https://${env.BRANCH}--${env.SITE_NAME}.netlify.app` : undefined
