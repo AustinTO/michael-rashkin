@@ -74,6 +74,7 @@ if (!dataset) throw new Error('Missing SANITY_STUDIO_DATASET, PUBLIC_SANITY_DATA
 export default defineConfig({
   name: 'default',
   title: 'MichaelRashkin.com',
+  basePath: '/studio',
   projectId,
   dataset,
   apiVersion,
