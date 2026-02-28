@@ -45,8 +45,6 @@ const netlifySiteUrl = toAbsoluteOrigin(env.DEPLOY_PRIME_URL || env.URL);
 const netlifyBranchUrl = toAbsoluteOrigin(
   env.BRANCH && env.SITE_NAME ? `https://${env.BRANCH}--${env.SITE_NAME}.netlify.app` : undefined
 );
-const publicSiteUrl = toAbsoluteOrigin(env.PUBLIC_SITE_URL);
-const publicSiteIsLocalhost = !!publicSiteUrl && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(publicSiteUrl);
 const configuredPreviewOrigin = toAbsoluteOrigin(env.SANITY_STUDIO_PREVIEW_ORIGIN);
 const configuredPreviewIsLocalhost =
   !!configuredPreviewOrigin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configuredPreviewOrigin);
@@ -56,7 +54,6 @@ const previewOrigin =
     ? 'http://localhost:4321'
     : netlifySiteUrl ||
       netlifyBranchUrl ||
-      (publicSiteIsLocalhost ? undefined : publicSiteUrl) ||
       'https://michaelrashkin.netlify.app');
 const presentationAllowOrigins = Array.from(
   new Set([
@@ -64,7 +61,6 @@ const presentationAllowOrigins = Array.from(
     'https://michaelrashkin.netlify.app',
     netlifySiteUrl,
     netlifyBranchUrl,
-    !publicSiteIsLocalhost ? publicSiteUrl : undefined,
     previewOrigin
   ].filter((v): v is string => !!v))
 );
