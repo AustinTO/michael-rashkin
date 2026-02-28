@@ -41,10 +41,11 @@ const apiVersion =
 const netlifyContext = env.CONTEXT;
 const viteDev = Boolean((import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV);
 const isDev = netlifyContext ? netlifyContext === 'dev' : env.NODE_ENV === 'development' || viteDev;
-const netlifySiteUrl = toAbsoluteOrigin(env.DEPLOY_PRIME_URL || env.URL);
+const netlifyBranchDeployUrl = toAbsoluteOrigin(env.BRANCH_DEPLOY_URL);
 const netlifyBranchUrl = toAbsoluteOrigin(
   env.BRANCH && env.SITE_NAME ? `https://${env.BRANCH}--${env.SITE_NAME}.netlify.app` : undefined
 );
+const netlifySiteUrl = toAbsoluteOrigin(env.DEPLOY_PRIME_URL || env.URL);
 const configuredPreviewOrigin = toAbsoluteOrigin(env.SANITY_STUDIO_PREVIEW_ORIGIN);
 const configuredPreviewIsLocalhost =
   !!configuredPreviewOrigin && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(configuredPreviewOrigin);
@@ -52,15 +53,17 @@ const previewOrigin =
   (isDev || !configuredPreviewIsLocalhost ? configuredPreviewOrigin : undefined) ||
   (isDev
     ? 'http://localhost:4321'
-    : netlifySiteUrl ||
+    : netlifyBranchDeployUrl ||
       netlifyBranchUrl ||
+      netlifySiteUrl ||
       'https://michaelrashkin.netlify.app');
 const presentationAllowOrigins = Array.from(
   new Set([
     ...(isDev ? ['http://localhost:4321'] : []),
     'https://michaelrashkin.netlify.app',
-    netlifySiteUrl,
+    netlifyBranchDeployUrl,
     netlifyBranchUrl,
+    netlifySiteUrl,
     previewOrigin
   ].filter((v): v is string => !!v))
 );
