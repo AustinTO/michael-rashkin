@@ -28,8 +28,8 @@ const heroImageUrl = page?.heroImage ? urlFor(page.heroImage).width(1600).qualit
 const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
 ---
 <BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
-  <section class="hero">
-    <div class="hero-shell">
+  <section class="hero-wrap">
+    <div class="hero-sticky">
       <div class="hero-bg" aria-hidden="true">
         <video
           class="hero-video"
@@ -39,16 +39,16 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
           playsinline
           preload="metadata"
           poster="/hero-poster.avif"
-        >
-          <source src="/hero.webm" type="video/webm" />
-          <source src="/hero.mp4" type="video/mp4" />
-        </video>
-        <div class="hero-overlay"></div>
+          data-webm="/bghero1-hero-optimized.webm"
+          data-mp4="/bghero1-hero-optimized.mp4"
+        ></video>
+        <div class="hero-overlay-gradient"></div>
+        <div class="hero-overlay-noise"></div>
       </div>
       <div class="hero-bottom-fade"></div>
 
       <div class="hero-content container">
-        <div class="prose hero-copy reveal">
+        <div class="prose hero-copy">
           {html ? <div set:html={html} /> : null}
 
           {heroActions.length ? (
@@ -74,7 +74,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
           ) : null}
         </div>
         {heroImageUrl ? (
-          <div class="hero-image-wrap reveal">
+          <div class="hero-image-wrap">
             <img
               src={heroImageUrl}
               alt={heroImageAlt}
@@ -142,279 +142,326 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
 </BaseLayout>
 
 <script>
+  const root = document.documentElement;
+  const heroWrap = document.querySelector('.hero-wrap');
+  const heroSticky = document.querySelector('.hero-sticky');
+  const heroVideo = document.querySelector('.hero-video');
+  const heroGradient = document.querySelector('.hero-overlay-gradient');
+  const heroContent = document.querySelector('.hero-content');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const hero = document.querySelector('.hero');
-  const heroShell = document.querySelector('.hero-shell');
+  const canUseFinePointer = window.matchMedia('(pointer: fine)');
 
-  let clipRaf = 0;
-  const updateHeroClose = () => {
-    if (!(hero instanceof HTMLElement) || !(heroShell instanceof HTMLElement)) return;
-    const rect = hero.getBoundingClientRect();
-    const progressed = Math.max(0, -rect.top);
-    const distance = Math.max(1, heroShell.offsetHeight * 1.1);
-    const closePct = Math.min(100, (progressed / distance) * 100);
-    heroShell.style.clipPath = `inset(0 0 ${closePct.toFixed(3)}% 0)`;
-  };
+  if (
+    !(heroWrap instanceof HTMLElement) ||
+    !(heroSticky instanceof HTMLElement) ||
+    !(heroVideo instanceof HTMLVideoElement) ||
+    !(heroGradient instanceof HTMLElement) ||
+    !(heroContent instanceof HTMLElement)
+  ) {
+    // no-op
+  } else {
+    let rafId = 0;
+    let active = false;
+    let progress = 0;
+    let lastProgress = -1;
+    let sourcesLoaded = false;
+    let scrubEnabled = false;
+    let scrubDuration = 0;
+    const scrubStart = 0;
 
-  const onClipScroll = () => {
-    if (clipRaf) return;
-    clipRaf = requestAnimationFrame(() => {
-      updateHeroClose();
-      clipRaf = 0;
-    });
-  };
+    const isDark = () => root.classList.contains('dark');
+    const isReduced = () => reducedMotion.matches;
+    const canScrub = () => canUseFinePointer.matches && window.innerWidth >= 1024 && !isReduced();
 
-  const applyMotionPreference = () => {
-    document.querySelectorAll('.hero-video').forEach((node) => {
-      if (!(node instanceof HTMLVideoElement)) return;
-      if (reducedMotion.matches) {
-        node.pause();
-        node.removeAttribute('autoplay');
-        node.removeAttribute('loop');
-        node.currentTime = 0;
-        node.load();
+    const loadSourcesIfNeeded = () => {
+      if (sourcesLoaded || !isDark()) return;
+      const webm = heroVideo.dataset.webm;
+      const mp4 = heroVideo.dataset.mp4;
+      if (webm) {
+        const sourceWebm = document.createElement('source');
+        sourceWebm.src = webm;
+        sourceWebm.type = 'video/webm';
+        heroVideo.appendChild(sourceWebm);
       }
-    });
-  };
-  applyMotionPreference();
-  reducedMotion.addEventListener?.('change', applyMotionPreference);
-  window.addEventListener('scroll', onClipScroll, { passive: true });
-  window.addEventListener('resize', onClipScroll, { passive: true });
-  onClipScroll();
+      if (mp4) {
+        const sourceMp4 = document.createElement('source');
+        sourceMp4.src = mp4;
+        sourceMp4.type = 'video/mp4';
+        heroVideo.appendChild(sourceMp4);
+      }
+      heroVideo.load();
+      sourcesLoaded = true;
+    };
+
+    const updateVideoMode = () => {
+      if (!isDark()) {
+        heroVideo.pause();
+        heroVideo.style.opacity = '0';
+        return;
+      }
+      loadSourcesIfNeeded();
+      heroVideo.style.opacity = '';
+      if (isReduced()) {
+        heroVideo.loop = true;
+        scrubEnabled = false;
+        void heroVideo.play().catch(() => {});
+        return;
+      }
+
+      if (canScrub() && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
+        scrubDuration = Math.min(heroVideo.duration, 4.5);
+        scrubEnabled = scrubDuration > 0;
+      } else {
+        scrubEnabled = false;
+      }
+
+      if (scrubEnabled) {
+        heroVideo.pause();
+        heroVideo.loop = false;
+      } else {
+        heroVideo.loop = true;
+        void heroVideo.play().catch(() => {});
+      }
+    };
+
+    const applyProgress = (p) => {
+      progress = Math.max(0, Math.min(1, p));
+      const maxTranslate = canUseFinePointer.matches ? 8 : 4;
+      const translateY = isReduced() ? 0 : -maxTranslate * progress;
+      const gradientBoost = isReduced() ? 0 : progress * 0.05;
+      const exitStart = 0.82;
+      const exitProgress = Math.max(0, (progress - exitStart) / (1 - exitStart));
+      const contentTranslate = isReduced() ? 0 : -10 * exitProgress;
+      const contentOpacity = 1 - exitProgress * 0.1;
+
+      heroVideo.style.transform = `translate3d(0, ${translateY.toFixed(2)}px, 0)`;
+      heroGradient.style.opacity = `${(1 + gradientBoost).toFixed(3)}`;
+      heroContent.style.transform = `translate3d(0, ${contentTranslate.toFixed(2)}px, 0)`;
+      heroContent.style.opacity = `${contentOpacity.toFixed(3)}`;
+
+      if (scrubEnabled && sourcesLoaded && isDark() && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
+        const targetTime = scrubStart + progress * scrubDuration;
+        const current = Number.isFinite(heroVideo.currentTime) ? heroVideo.currentTime : targetTime;
+        const eased = current + (targetTime - current) * 0.12;
+        try {
+          heroVideo.currentTime = Math.max(0, Math.min(heroVideo.duration, eased));
+        } catch {
+          scrubEnabled = false;
+          heroVideo.loop = true;
+          void heroVideo.play().catch(() => {});
+        }
+      } else if (sourcesLoaded && isDark() && progress >= 1 && !isReduced()) {
+        heroVideo.loop = true;
+        void heroVideo.play().catch(() => {});
+      }
+    };
+
+    const calculateProgress = () => {
+      const rect = heroWrap.getBoundingClientRect();
+      const stickyHeight = heroSticky.offsetHeight || window.innerHeight;
+      const pinDistance = Math.max(1, heroWrap.offsetHeight - stickyHeight);
+      return Math.max(0, Math.min(1, -rect.top / pinDistance));
+    };
+
+    const tick = () => {
+      if (!active) {
+        rafId = 0;
+        return;
+      }
+      const p = calculateProgress();
+      if (Math.abs(p - lastProgress) > 0.001) {
+        lastProgress = p;
+        applyProgress(p);
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        active = !!entry?.isIntersecting;
+        if (active) {
+          updateVideoMode();
+          start();
+        }
+      },
+      { rootMargin: '200px 0px 200px 0px' }
+    );
+    io.observe(heroWrap);
+
+    heroVideo.addEventListener('loadedmetadata', updateVideoMode);
+    reducedMotion.addEventListener?.('change', updateVideoMode);
+    canUseFinePointer.addEventListener?.('change', updateVideoMode);
+    window.addEventListener('resize', updateVideoMode, { passive: true });
+
+    const classObserver = new MutationObserver(updateVideoMode);
+    classObserver.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    updateVideoMode();
+    applyProgress(0);
+  }
 </script>
 
 <style>
-.hero {
-  --hero-runway: 2vh;
-  padding-top: 0;
-  padding-bottom: 0;
-  margin-bottom: 0;
-  min-height: calc(clamp(400px, 52vh, 640px) + var(--hero-runway));
-}
-.hero-shell {
+.hero-wrap {
   position: relative;
-  position: sticky;
-  top: 80px;
-  overflow: hidden;
-  min-height: clamp(400px, 52vh, 640px);
-  background: var(--surface-2);
-  will-change: clip-path;
+  height: 160vh;
+  margin-bottom: 0;
 }
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-  }
+
+.hero-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .hero-video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.34;
-  filter: blur(1px);
-  -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      rgba(0, 0, 0, 0.94) 30%,
-      rgba(0, 0, 0, 1) 46%,
-      rgba(0, 0, 0, 1) 100%
-    ),
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 1) 66%,
-      rgba(0, 0, 0, 0.95) 82%,
-      transparent 100%
-    );
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      rgba(0, 0, 0, 0.94) 30%,
-      rgba(0, 0, 0, 1) 46%,
-      rgba(0, 0, 0, 1) 100%
-    ),
-    linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 1) 66%,
-      rgba(0, 0, 0, 0.95) 82%,
-      transparent 100%
-    );
-  mask-composite: intersect;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  will-change: transform;
 }
-  .hero-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(var(--overlay-tint), var(--overlay-heavy)),
-      linear-gradient(
-        to right,
-        var(--overlay-heavy) 0%,
-        color-mix(in srgb, var(--overlay-heavy) 92%, transparent) 34%,
-        color-mix(in srgb, var(--overlay-tint) 68%, transparent) 56%,
-        transparent 90%
-      );
-  }
-  .hero-bottom-fade {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      transparent 64%,
-      color-mix(in srgb, var(--hero-fade) 60%, transparent) 84%,
-      var(--hero-fade) 100%
-    );
-  }
-  .hero-shell::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background:
-      linear-gradient(
-        to right,
-        var(--overlay-heavy) 0%,
-        color-mix(in srgb, var(--overlay-heavy) 86%, transparent) 18%,
-        color-mix(in srgb, var(--overlay-tint) 54%, transparent) 30%,
-        transparent 44%
-      ),
-      linear-gradient(
-        to bottom,
-        transparent 0%,
-        transparent 68%,
-        color-mix(in srgb, var(--hero-fade) 44%, transparent) 88%,
-        color-mix(in srgb, var(--hero-fade) 82%, transparent) 100%
-      );
-  }
-  .hero-content {
-    position: relative;
-    z-index: 4;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-  .hero-copy {
-    max-width: 920px;
-    position: relative;
-    isolation: isolate;
-  }
-  .hero-copy::before {
-    content: "";
-    position: absolute;
-    inset: -16px -20px;
-    z-index: -1;
-    pointer-events: none;
-    opacity: 0.045;
-    background-image: linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--accent) 22%, transparent) 1px,
-      transparent 1px
-    );
-    background-size: 100% 48px;
-    mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      rgba(0, 0, 0, 0.92) 14%,
-      rgba(0, 0, 0, 0.92) 86%,
-      transparent 100%
-    );
-  }
-  .hero-actions {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    margin-top: 28px;
-  }
-  .hero-image-wrap {
-    margin-top: 28px;
-    position: relative;
-    z-index: 2;
-  }
-  .hero-image {
-    width: 100%;
-    max-width: 1040px;
-    height: auto;
-    display: block;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    box-shadow: none;
-  }
-  .hero-divider {
-    margin-top: 56px;
-    height: 1px;
-    width: min(1040px, 100%);
-    background: linear-gradient(90deg, transparent 0%, var(--accent-glow) 50%, transparent 100%);
-    position: relative;
-    z-index: 2;
-  }
-  .featured-grid > *:first-child {
-    grid-column: span 2;
-      box-shadow: var(--depth-2);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .featured-grid > *:first-child:hover {
-      box-shadow: var(--depth-3);
-    }
-  }
-  @media (max-width: 960px) {
-    .hero {
-      --hero-runway: 2vh;
-      padding-top: 0;
-      margin-bottom: 0;
-      min-height: calc(clamp(345px, 56vh, 560px) + var(--hero-runway));
-    }
-    .hero-shell {
-      top: 72px;
-      min-height: clamp(345px, 56vh, 560px);
-    }
-    .hero-video {
-      opacity: 0.56;
-      filter: blur(0.8px);
-      -webkit-mask-image: none;
-      mask-image: none;
-    }
-    .hero-overlay {
-      background: linear-gradient(
-        to right,
-        color-mix(in srgb, var(--overlay-heavy) 72%, transparent) 0%,
-        color-mix(in srgb, var(--overlay-tint) 44%, transparent) 42%,
-        color-mix(in srgb, var(--overlay-tint) 24%, transparent) 72%,
-        transparent 100%
-      );
-    }
-    .hero-shell::before {
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        transparent 72%,
-        color-mix(in srgb, var(--hero-fade) 52%, transparent) 88%,
-        var(--hero-fade) 100%
-      );
-    }
-    .hero-bottom-fade {
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        transparent 74%,
-        color-mix(in srgb, var(--hero-fade) 52%, transparent) 90%,
-        color-mix(in srgb, var(--hero-fade) 86%, transparent) 100%
-      );
-    }
-    .featured-grid > *:first-child {
-      grid-column: span 1;
-    }
-  }
 
-.hero + .container.section-rule {
+.hero-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+      to right,
+      var(--overlay-heavy) 0%,
+      color-mix(in srgb, var(--overlay-heavy) 90%, transparent) 34%,
+      color-mix(in srgb, var(--overlay-tint) 68%, transparent) 56%,
+      transparent 90%
+    ),
+    linear-gradient(var(--overlay-tint), var(--overlay-heavy));
+  transform: translate3d(0, 0, 0);
+  will-change: opacity;
+}
+
+.hero-overlay-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+
+.hero-bottom-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 64%,
+    color-mix(in srgb, var(--hero-fade) 60%, transparent) 84%,
+    var(--hero-fade) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 4;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: clamp(86px, 12vh, 130px);
+  padding-bottom: clamp(42px, 10vh, 84px);
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+
+.hero-copy {
+  max-width: 920px;
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
+.hero-image-wrap {
+  margin-top: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-image {
+  width: 100%;
+  max-width: 1040px;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.hero-divider {
+  margin-top: 28px;
+  height: 1px;
+  width: min(1040px, 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--accent-glow) 50%, transparent 100%);
+}
+
+.featured-grid > *:first-child {
+  grid-column: span 2;
+  box-shadow: var(--depth-2);
+}
+
+.hero-wrap + .container.section-rule {
   margin-top: var(--space-3);
 }
-  .hero + .container.section-rule .section-divider {
-    display: block;
+
+@media (hover: hover) and (pointer: fine) {
+  .featured-grid > *:first-child:hover {
+    box-shadow: var(--depth-3);
   }
+}
+
+@media (max-width: 960px) {
+  .hero-wrap {
+    height: 145vh;
+  }
+
+  .hero-content {
+    padding-top: 96px;
+    padding-bottom: 54px;
+  }
+
+  .hero-video {
+    opacity: 0.42;
+  }
+
+  .hero-overlay-noise {
+    opacity: 0.03;
+  }
+
+  .featured-grid > *:first-child {
+    grid-column: span 1;
+  }
+}
 </style>
