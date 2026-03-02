@@ -195,10 +195,12 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
 
     const updateVideoMode = () => {
       if (!isDark()) {
+        heroWrap.classList.remove('is-dark-active');
         heroVideo.pause();
         heroVideo.style.opacity = '0';
         return;
       }
+      heroWrap.classList.add('is-dark-active');
       loadSourcesIfNeeded();
       heroVideo.style.opacity = '';
       if (isReduced()) {
@@ -341,6 +343,10 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
   will-change: transform;
 }
 
+.hero-wrap.is-dark-active .hero-video {
+  opacity: 0.58;
+}
+
 .hero-overlay-gradient {
   position: absolute;
   inset: 0;
@@ -453,7 +459,11 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
   }
 
   .hero-video {
-    opacity: 0.42;
+    opacity: 0;
+  }
+
+  .hero-wrap.is-dark-active .hero-video {
+    opacity: 0.46;
   }
 
   .hero-overlay-noise {
