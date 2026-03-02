@@ -185,18 +185,18 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
 
 <style>
 .hero {
-  --hero-runway: 6vh;
+  --hero-runway: 2vh;
   padding-top: 0;
   padding-bottom: 0;
   margin-bottom: 0;
-  min-height: calc(clamp(430px, 58vh, 700px) + var(--hero-runway));
+  min-height: calc(clamp(400px, 52vh, 640px) + var(--hero-runway));
 }
 .hero-shell {
   position: relative;
   position: sticky;
   top: 80px;
   overflow: hidden;
-  min-height: clamp(430px, 58vh, 700px);
+  min-height: clamp(400px, 52vh, 640px);
   background: var(--surface-2);
   will-change: clip-path;
 }
@@ -411,9 +411,9 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     }
   }
 
-  .hero + .container.section-rule {
-    margin-top: var(--space-7);
-  }
+.hero + .container.section-rule {
+  margin-top: var(--space-3);
+}
   .hero + .container.section-rule .section-divider {
     display: block;
   }
