@@ -35,13 +35,38 @@ const visualEditingEnabled = visualEditingConfigured && isPresentationRequest;
     <meta property="og:type" content="website" />
 
     <meta name="twitter:card" content="summary" />
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const useDark = stored ? stored === 'dark' : prefersDark;
+          document.documentElement.classList.toggle('dark', useDark);
+        } catch {}
+      })();
+    </script>
   </head>
   <body>
+    <div class="reading-progress" aria-hidden="true"><div class="reading-progress-bar" id="reading-progress-bar"></div></div>
     <Header />
     <main>
       <slot />
     </main>
     <Footer />
     <VisualEditing enabled={visualEditingEnabled} zIndex={1000} />
+    <script is:inline>
+      (() => {
+        const bar = document.getElementById('reading-progress-bar');
+        if (!bar) return;
+        const update = () => {
+          const max = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = max > 0 ? (window.scrollY / max) * 100 : 0;
+          bar.style.width = `${Math.max(0, Math.min(100, progress))}%`;
+        };
+        update();
+        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update, { passive: true });
+      })();
+    </script>
   </body>
 </html>

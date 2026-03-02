@@ -22,6 +22,11 @@ const nav = [
         </a>
       ))}
     </nav>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme" aria-pressed="false">
+      <span class="theme-icon sun" aria-hidden="true">☼</span>
+      <span class="theme-icon moon" aria-hidden="true">◐</span>
+      <span class="theme-knob" aria-hidden="true"></span>
+    </button>
     <a class="btn btn-primary header-cta" href="/newsletter">Newsletter</a>
     <details class="mobile-menu">
       <summary class="mobile-menu-btn">Menu</summary>
@@ -66,6 +71,23 @@ const nav = [
       if (event.key === 'Escape') closeMenu();
     });
   }
+
+  const root = document.documentElement;
+  const toggle = document.getElementById('theme-toggle');
+  if (toggle instanceof HTMLButtonElement) {
+    const sync = () => {
+      const dark = root.classList.contains('dark');
+      toggle.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    };
+    sync();
+    toggle.addEventListener('click', () => {
+      const dark = root.classList.toggle('dark');
+      try {
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+      } catch {}
+      sync();
+    });
+  }
 </script>
 
 <style>
@@ -73,15 +95,15 @@ const nav = [
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(247, 244, 239, 0.88);
+    background: color-mix(in srgb, var(--bg-main) 88%, transparent);
     backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--border);
     transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
   }
   .site-header.is-scrolled {
-    background: rgba(247, 244, 239, 0.97);
-    border-bottom-color: #d6cdc2;
-    box-shadow: 0 18px 36px -28px var(--shadow);
+    background: color-mix(in srgb, var(--bg-main) 96%, transparent);
+    border-bottom-color: var(--border);
+    box-shadow: var(--depth-1);
   }
   .header-inner {
     min-height: 80px;
@@ -139,9 +161,48 @@ const nav = [
   }
   .header-cta {
     margin-left: 10px;
-    padding-inline: 16px;
-    font-size: 0.88rem;
-    min-height: 40px;
+    padding-inline: 14px;
+    font-size: 0.84rem;
+    min-height: 38px;
+    font-weight: 610;
+  }
+  .theme-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: 10px;
+    width: 66px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    color: var(--text-muted);
+    padding: 0 10px;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+  .theme-icon {
+    font-size: 0.72rem;
+    line-height: 1;
+    z-index: 1;
+  }
+  .theme-knob {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    left: 4px;
+    top: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: var(--depth-1);
+    transition: transform 150ms ease, background-color 150ms ease;
+  }
+  .theme-toggle[aria-pressed="true"] .theme-knob {
+    transform: translateX(32px);
+  }
+  .theme-toggle[aria-pressed="true"] {
+    color: color-mix(in srgb, var(--text-primary) 84%, var(--text-secondary));
   }
   .mobile-menu { display: none; }
   .mobile-menu-btn { list-style: none; }
@@ -150,9 +211,12 @@ const nav = [
     .header-inner { min-height: 72px; gap: 14px; }
     .nav { display: none; }
     .header-cta { display: none; }
+    .theme-toggle {
+      margin-left: auto;
+    }
     .mobile-menu {
       display: block;
-      margin-left: auto;
+      margin-left: 10px;
       position: relative;
     }
     .mobile-menu-btn {
@@ -201,7 +265,7 @@ const nav = [
     }
     .mobile-newsletter {
       margin-top: 4px;
-      color: #fff7f0;
+      color: var(--bg-surface);
       background: var(--accent);
       font-weight: 700;
     }
