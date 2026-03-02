@@ -344,7 +344,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
 }
 
 .hero-wrap.is-dark-active .hero-video {
-  opacity: 0.58;
+  opacity: 0.72;
 }
 
 .hero-overlay-gradient {
@@ -353,12 +353,15 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
   z-index: 1;
   background: linear-gradient(
       to right,
-      var(--overlay-heavy) 0%,
-      color-mix(in srgb, var(--overlay-heavy) 90%, transparent) 34%,
-      color-mix(in srgb, var(--overlay-tint) 68%, transparent) 56%,
+      color-mix(in srgb, var(--overlay-heavy) 86%, transparent) 0%,
+      color-mix(in srgb, var(--overlay-heavy) 70%, transparent) 34%,
+      color-mix(in srgb, var(--overlay-tint) 50%, transparent) 56%,
       transparent 90%
     ),
-    linear-gradient(var(--overlay-tint), var(--overlay-heavy));
+    linear-gradient(
+      color-mix(in srgb, var(--overlay-tint) 82%, transparent),
+      color-mix(in srgb, var(--overlay-heavy) 86%, transparent)
+    );
   transform: translate3d(0, 0, 0);
   will-change: opacity;
 }
@@ -463,7 +466,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
   }
 
   .hero-wrap.is-dark-active .hero-video {
-    opacity: 0.46;
+    opacity: 0.56;
   }
 
   .hero-overlay-noise {
