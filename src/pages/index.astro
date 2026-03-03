@@ -166,7 +166,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     let lastProgress = -1;
     let sourcesLoaded = false;
     let scrollPlayEnabled = false;
-    let scrollPlayPrimed = false;
+    let segmentPhase = 'first';
 
     const isDark = () => root.classList.contains('dark');
     const isReduced = () => reducedMotion.matches;
@@ -205,24 +205,24 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
       if (isReduced()) {
         heroVideo.loop = true;
         scrollPlayEnabled = false;
-        scrollPlayPrimed = false;
+        segmentPhase = 'first';
         void heroVideo.play().catch(() => {});
         return;
       }
 
       scrollPlayEnabled = canScrollPlay();
-      heroVideo.loop = true;
+      heroVideo.loop = false;
       if (scrollPlayEnabled) {
-        const half = heroVideo.duration * 0.5;
-        if (!scrollPlayPrimed) {
-          try {
-            heroVideo.currentTime = Math.max(0, Math.min(heroVideo.duration - 0.05, half));
-            scrollPlayPrimed = true;
-          } catch {}
-        }
-        heroVideo.pause();
+        const switchThreshold = 0.02;
+        segmentPhase = progress <= switchThreshold ? 'first' : 'second';
+        const midPoint = heroVideo.duration * 0.5;
+        try {
+          heroVideo.currentTime = segmentPhase === 'first' ? 0 : midPoint;
+        } catch {}
+        void heroVideo.play().catch(() => {});
       } else {
-        scrollPlayPrimed = false;
+        segmentPhase = 'first';
+        heroVideo.loop = true;
         void heroVideo.play().catch(() => {});
       }
     };
@@ -245,31 +245,32 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
       if (scrollPlayEnabled && sourcesLoaded && isDark() && !isReduced()) {
         const switchThreshold = 0.02;
         const midPoint = heroVideo.duration * 0.5;
-
+        const nextPhase = progress <= switchThreshold ? 'first' : 'second';
+        if (nextPhase !== segmentPhase) {
+          segmentPhase = nextPhase;
+          try {
+            heroVideo.currentTime = segmentPhase === 'first' ? 0 : midPoint;
+          } catch {}
+        }
         if (heroVideo.paused) {
           void heroVideo.play().catch(() => {});
         }
-        heroVideo.loop = false;
-
-        if (progress <= switchThreshold) {
-          if (Number.isFinite(heroVideo.currentTime) && heroVideo.currentTime >= midPoint) {
-            try {
-              heroVideo.currentTime = 0;
-            } catch {}
-          }
-        } else {
-          if (Number.isFinite(heroVideo.currentTime) && heroVideo.currentTime >= heroVideo.duration - 0.04) {
-            try {
-              heroVideo.currentTime = midPoint;
-            } catch {}
-          }
-          if (Number.isFinite(heroVideo.currentTime) && heroVideo.currentTime < midPoint) {
-            try {
-              heroVideo.currentTime = midPoint;
-            } catch {}
-          }
+        if (segmentPhase === 'first' && Number.isFinite(heroVideo.currentTime) && heroVideo.currentTime >= midPoint) {
+          try {
+            heroVideo.currentTime = 0;
+          } catch {}
+        }
+        if (
+          segmentPhase === 'second' &&
+          Number.isFinite(heroVideo.currentTime) &&
+          (heroVideo.currentTime < midPoint || heroVideo.currentTime >= heroVideo.duration - 0.04)
+        ) {
+          try {
+            heroVideo.currentTime = midPoint;
+          } catch {}
         }
       } else if (sourcesLoaded && isDark() && heroVideo.paused && !isReduced()) {
+        heroVideo.loop = true;
         void heroVideo.play().catch(() => {});
       }
     };
@@ -313,6 +314,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     io.observe(heroWrap);
 
     heroVideo.addEventListener('loadedmetadata', updateVideoMode);
+    heroVideo.addEventListener('canplay', updateVideoMode);
     reducedMotion.addEventListener?.('change', updateVideoMode);
     canUseFinePointer.addEventListener?.('change', updateVideoMode);
     window.addEventListener('resize', updateVideoMode, { passive: true });
