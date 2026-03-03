@@ -322,6 +322,23 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     const classObserver = new MutationObserver(updateVideoMode);
     classObserver.observe(root, { attributes: true, attributeFilter: ['class'] });
 
+    heroVideo.addEventListener('timeupdate', () => {
+      if (!scrollPlayEnabled || !isDark() || isReduced() || !Number.isFinite(heroVideo.duration) || heroVideo.duration <= 1) {
+        return;
+      }
+      const midPoint = heroVideo.duration * 0.5;
+      if (segmentPhase === 'first' && heroVideo.currentTime >= midPoint) {
+        try {
+          heroVideo.currentTime = 0;
+        } catch {}
+      }
+      if (segmentPhase === 'second' && heroVideo.currentTime >= heroVideo.duration - 0.04) {
+        try {
+          heroVideo.currentTime = midPoint;
+        } catch {}
+      }
+    });
+
     updateVideoMode();
     applyProgress(0);
   }
