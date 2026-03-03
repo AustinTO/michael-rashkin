@@ -39,8 +39,10 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
           playsinline
           preload="metadata"
           poster="/hero-poster.avif"
-          data-webm="/bghero1-hero-optimized.webm"
-          data-mp4="/bghero1-hero-optimized.mp4"
+          data-dark-webm="/bghero1-hero-optimized.webm"
+          data-dark-mp4="/bghero1-hero-optimized.mp4"
+          data-light-webm="/lightbg-hero-slow.webm"
+          data-light-mp4="/lightbg-hero-slow.mp4"
         ></video>
         <div class="hero-overlay-gradient"></div>
         <div class="hero-overlay-noise"></div>
@@ -164,14 +166,16 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     let active = false;
     let progress = 0;
     let lastProgress = -1;
-    let sourcesLoaded = false;
+    let loadedTheme = '';
     const isDark = () => root.classList.contains('dark');
     const isReduced = () => reducedMotion.matches;
 
-    const loadSourcesIfNeeded = () => {
-      if (sourcesLoaded || !isDark()) return;
-      const webm = heroVideo.dataset.webm;
-      const mp4 = heroVideo.dataset.mp4;
+    const loadSourcesForTheme = () => {
+      const theme = isDark() ? 'dark' : 'light';
+      if (loadedTheme === theme) return;
+      const webm = isDark() ? heroVideo.dataset.darkWebm : heroVideo.dataset.lightWebm;
+      const mp4 = isDark() ? heroVideo.dataset.darkMp4 : heroVideo.dataset.lightMp4;
+      heroVideo.innerHTML = '';
       if (webm) {
         const sourceWebm = document.createElement('source');
         sourceWebm.src = webm;
@@ -185,18 +189,12 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
         heroVideo.appendChild(sourceMp4);
       }
       heroVideo.load();
-      sourcesLoaded = true;
+      loadedTheme = theme;
     };
 
     const updateVideoMode = () => {
-      if (!isDark()) {
-        heroWrap.classList.remove('is-dark-active');
-        heroVideo.pause();
-        heroVideo.style.opacity = '0';
-        return;
-      }
-      heroWrap.classList.add('is-dark-active');
-      loadSourcesIfNeeded();
+      heroWrap.classList.toggle('is-dark-active', isDark());
+      loadSourcesForTheme();
       heroVideo.style.opacity = '';
       heroVideo.loop = true;
       void heroVideo.play().catch(() => {});
@@ -217,7 +215,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
       heroContent.style.transform = `translate3d(0, ${contentTranslate.toFixed(2)}px, 0)`;
       heroContent.style.opacity = `${contentOpacity.toFixed(3)}`;
 
-      if (sourcesLoaded && isDark() && heroVideo.paused && !isReduced()) {
+      if (loadedTheme && heroVideo.paused && !isReduced()) {
         heroVideo.loop = true;
         void heroVideo.play().catch(() => {});
       }
