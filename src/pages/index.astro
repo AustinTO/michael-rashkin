@@ -38,11 +38,13 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
           loop
           playsinline
           preload="metadata"
-          poster="/hero-poster.avif"
-          data-dark-webm="/bghero1-hero-optimized.webm"
-          data-dark-mp4="/bghero1-hero-optimized.mp4"
-          data-light-webm="/lightbg-hero-slow.webm"
-          data-light-mp4="/lightbg-hero-slow.mp4"
+          poster="/hero-poster-light.avif"
+          data-dark-poster="/hero-poster-dark.avif"
+          data-light-poster="/hero-poster-light.avif"
+          data-dark-webm="/bghero1-hero-optimized-pingpong.webm"
+          data-dark-mp4="/bghero1-hero-optimized-pingpong.mp4"
+          data-light-webm="/lightbg-hero-slow-pingpong.webm"
+          data-light-mp4="/lightbg-hero-slow-pingpong.mp4"
         ></video>
         <div class="hero-overlay-gradient"></div>
         <div class="hero-overlay-noise"></div>
@@ -173,9 +175,13 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     const loadSourcesForTheme = () => {
       const theme = isDark() ? 'dark' : 'light';
       if (loadedTheme === theme) return;
+      const poster = isDark() ? heroVideo.dataset.darkPoster : heroVideo.dataset.lightPoster;
       const webm = isDark() ? heroVideo.dataset.darkWebm : heroVideo.dataset.lightWebm;
       const mp4 = isDark() ? heroVideo.dataset.darkMp4 : heroVideo.dataset.lightMp4;
+      heroVideo.pause();
+      heroVideo.removeAttribute('src');
       heroVideo.innerHTML = '';
+      if (poster) heroVideo.poster = poster;
       if (webm) {
         const sourceWebm = document.createElement('source');
         sourceWebm.src = webm;
@@ -260,6 +266,10 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     io.observe(heroWrap);
 
     heroVideo.addEventListener('loadedmetadata', updateVideoMode);
+    heroVideo.addEventListener('ended', () => {
+      heroVideo.currentTime = 0;
+      void heroVideo.play().catch(() => {});
+    });
     reducedMotion.addEventListener?.('change', updateVideoMode);
     canUseFinePointer.addEventListener?.('change', updateVideoMode);
     window.addEventListener('resize', updateVideoMode, { passive: true });
@@ -300,7 +310,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.38;
+  opacity: 0.44;
   pointer-events: none;
   transition: opacity 200ms ease;
   will-change: transform;
@@ -519,7 +529,7 @@ html.dark .card-premium {
   }
 
   .hero-video {
-    opacity: 0.32;
+    opacity: 0.38;
   }
 
   .hero-wrap.is-dark-active .hero-video {
