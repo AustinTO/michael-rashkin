@@ -94,6 +94,18 @@ export default defineType({
           type: 'object',
           fields: [
             defineField({ name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required() }),
+            defineField({
+              name: 'image',
+              title: 'Optional image',
+              type: 'image',
+              options: { hotspot: true }
+            }),
+            defineField({
+              name: 'imageAlt',
+              title: 'Image alt text',
+              type: 'string',
+              description: 'Short description for accessibility when an image is provided.'
+            }),
             defineField({ name: 'description', title: 'Description', type: 'text', rows: 4 }),
             defineField({ name: 'buttonLabel', title: 'Button label', type: 'string' }),
             defineField({ name: 'buttonHref', title: 'Button href', type: 'string' })

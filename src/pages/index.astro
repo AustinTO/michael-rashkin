@@ -97,6 +97,14 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
       <div class="grid grid-3 stagger home-pillars">
         {homePillars.map((pillar) => (
           <div class="card card-panel card-premium reveal">
+            {pillar.image ? (
+              <img
+                src={urlFor(pillar.image).width(1200).height(680).fit('crop').quality(80).url()}
+                alt={pillar.imageAlt || pillar.title}
+                loading="lazy"
+                class="home-pillar-image"
+              />
+            ) : null}
             <h3 class="premium-title" style="margin-top:0;">{pillar.title}</h3>
             {pillar.description ? <p class="muted premium-body" style="margin-bottom:0;">{pillar.description}</p> : null}
             {pillar.buttonLabel && pillar.buttonHref ? (
@@ -483,6 +491,16 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
   line-height: 1.18;
   letter-spacing: -0.02em;
   margin-bottom: 20px;
+}
+
+.home-pillar-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  margin-bottom: 16px;
 }
 
 .premium-body {

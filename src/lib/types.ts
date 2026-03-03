@@ -119,7 +119,14 @@ export type SiteSettings = {
   credentialsLine?: string;
   credentialsLinkLabel?: string;
   credentialsLinkHref?: string;
-  homePillars?: { title: string; description?: string; buttonLabel?: string; buttonHref?: string }[];
+  homePillars?: {
+    title: string;
+    image?: any;
+    imageAlt?: string;
+    description?: string;
+    buttonLabel?: string;
+    buttonHref?: string;
+  }[];
   featuredTopics?: Topic[];
   pinnedContent?: ContentCardItem[];
 };
