@@ -4,5 +4,5 @@ import { formatDate } from '../lib/dates';
 const { date, prefix = 'Updated on' } = Astro.props as { date?: string; prefix?: string };
 ---
 {date ? (
-  <Badge variant="accent">{prefix} {formatDate(date)}</Badge>
+  <Badge variant="accent">{`${prefix} ${formatDate(date)}`}</Badge>
 ) : null}
