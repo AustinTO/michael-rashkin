@@ -165,12 +165,8 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     let progress = 0;
     let lastProgress = -1;
     let sourcesLoaded = false;
-    let scrollPlayEnabled = false;
-    let segmentPhase = 'first';
-
     const isDark = () => root.classList.contains('dark');
     const isReduced = () => reducedMotion.matches;
-    const canScrollPlay = () => !isReduced() && Number.isFinite(heroVideo.duration) && heroVideo.duration > 1;
 
     const loadSourcesIfNeeded = () => {
       if (sourcesLoaded || !isDark()) return;
@@ -202,29 +198,8 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
       heroWrap.classList.add('is-dark-active');
       loadSourcesIfNeeded();
       heroVideo.style.opacity = '';
-      if (isReduced()) {
-        heroVideo.loop = true;
-        scrollPlayEnabled = false;
-        segmentPhase = 'first';
-        void heroVideo.play().catch(() => {});
-        return;
-      }
-
-      scrollPlayEnabled = canScrollPlay();
-      heroVideo.loop = false;
-      if (scrollPlayEnabled) {
-        const switchThreshold = 0.02;
-        segmentPhase = progress <= switchThreshold ? 'first' : 'second';
-        const midPoint = heroVideo.duration * 0.5;
-        try {
-          heroVideo.currentTime = segmentPhase === 'first' ? 0 : midPoint;
-        } catch {}
-        void heroVideo.play().catch(() => {});
-      } else {
-        segmentPhase = 'first';
-        heroVideo.loop = true;
-        void heroVideo.play().catch(() => {});
-      }
+      heroVideo.loop = true;
+      void heroVideo.play().catch(() => {});
     };
 
     const applyProgress = (p) => {
@@ -242,34 +217,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
       heroContent.style.transform = `translate3d(0, ${contentTranslate.toFixed(2)}px, 0)`;
       heroContent.style.opacity = `${contentOpacity.toFixed(3)}`;
 
-      if (scrollPlayEnabled && sourcesLoaded && isDark() && !isReduced()) {
-        const switchThreshold = 0.02;
-        const midPoint = heroVideo.duration * 0.5;
-        const nextPhase = progress <= switchThreshold ? 'first' : 'second';
-        if (nextPhase !== segmentPhase) {
-          segmentPhase = nextPhase;
-          try {
-            heroVideo.currentTime = segmentPhase === 'first' ? 0 : midPoint;
-          } catch {}
-        }
-        if (heroVideo.paused) {
-          void heroVideo.play().catch(() => {});
-        }
-        if (segmentPhase === 'first' && Number.isFinite(heroVideo.currentTime) && heroVideo.currentTime >= midPoint) {
-          try {
-            heroVideo.currentTime = 0;
-          } catch {}
-        }
-        if (
-          segmentPhase === 'second' &&
-          Number.isFinite(heroVideo.currentTime) &&
-          (heroVideo.currentTime < midPoint || heroVideo.currentTime >= heroVideo.duration - 0.04)
-        ) {
-          try {
-            heroVideo.currentTime = midPoint;
-          } catch {}
-        }
-      } else if (sourcesLoaded && isDark() && heroVideo.paused && !isReduced()) {
+      if (sourcesLoaded && isDark() && heroVideo.paused && !isReduced()) {
         heroVideo.loop = true;
         void heroVideo.play().catch(() => {});
       }
@@ -314,30 +262,12 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     io.observe(heroWrap);
 
     heroVideo.addEventListener('loadedmetadata', updateVideoMode);
-    heroVideo.addEventListener('canplay', updateVideoMode);
     reducedMotion.addEventListener?.('change', updateVideoMode);
     canUseFinePointer.addEventListener?.('change', updateVideoMode);
     window.addEventListener('resize', updateVideoMode, { passive: true });
 
     const classObserver = new MutationObserver(updateVideoMode);
     classObserver.observe(root, { attributes: true, attributeFilter: ['class'] });
-
-    heroVideo.addEventListener('timeupdate', () => {
-      if (!scrollPlayEnabled || !isDark() || isReduced() || !Number.isFinite(heroVideo.duration) || heroVideo.duration <= 1) {
-        return;
-      }
-      const midPoint = heroVideo.duration * 0.5;
-      if (segmentPhase === 'first' && heroVideo.currentTime >= midPoint) {
-        try {
-          heroVideo.currentTime = 0;
-        } catch {}
-      }
-      if (segmentPhase === 'second' && heroVideo.currentTime >= heroVideo.duration - 0.04) {
-        try {
-          heroVideo.currentTime = midPoint;
-        } catch {}
-      }
-    });
 
     updateVideoMode();
     applyProgress(0);
