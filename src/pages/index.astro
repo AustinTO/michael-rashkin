@@ -165,13 +165,12 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
     let progress = 0;
     let lastProgress = -1;
     let sourcesLoaded = false;
-    let scrubEnabled = false;
-    let scrubDuration = 0;
-    const scrubStart = 0;
+    let scrollPlayEnabled = false;
+    let scrollPlayPrimed = false;
 
     const isDark = () => root.classList.contains('dark');
     const isReduced = () => reducedMotion.matches;
-    const canScrub = () => false;
+    const canScrollPlay = () => !isReduced() && Number.isFinite(heroVideo.duration) && heroVideo.duration > 1;
 
     const loadSourcesIfNeeded = () => {
       if (sourcesLoaded || !isDark()) return;
@@ -205,23 +204,25 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
       heroVideo.style.opacity = '';
       if (isReduced()) {
         heroVideo.loop = true;
-        scrubEnabled = false;
+        scrollPlayEnabled = false;
+        scrollPlayPrimed = false;
         void heroVideo.play().catch(() => {});
         return;
       }
 
-      if (canScrub() && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
-        scrubDuration = Math.min(heroVideo.duration, 4.5);
-        scrubEnabled = scrubDuration > 0;
-      } else {
-        scrubEnabled = false;
-      }
-
-      if (scrubEnabled) {
+      scrollPlayEnabled = canScrollPlay();
+      heroVideo.loop = true;
+      if (scrollPlayEnabled) {
+        const half = heroVideo.duration * 0.5;
+        if (!scrollPlayPrimed) {
+          try {
+            heroVideo.currentTime = Math.max(0, Math.min(heroVideo.duration - 0.05, half));
+            scrollPlayPrimed = true;
+          } catch {}
+        }
         heroVideo.pause();
-        heroVideo.loop = false;
       } else {
-        heroVideo.loop = true;
+        scrollPlayPrimed = false;
         void heroVideo.play().catch(() => {});
       }
     };
@@ -241,19 +242,26 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
       heroContent.style.transform = `translate3d(0, ${contentTranslate.toFixed(2)}px, 0)`;
       heroContent.style.opacity = `${contentOpacity.toFixed(3)}`;
 
-      if (scrubEnabled && sourcesLoaded && isDark() && Number.isFinite(heroVideo.duration) && heroVideo.duration > 0) {
-        const targetTime = scrubStart + progress * scrubDuration;
-        const current = Number.isFinite(heroVideo.currentTime) ? heroVideo.currentTime : targetTime;
-        const eased = current + (targetTime - current) * 0.12;
-        try {
-          heroVideo.currentTime = Math.max(0, Math.min(heroVideo.duration, eased));
-        } catch {
-          scrubEnabled = false;
-          heroVideo.loop = true;
+      if (scrollPlayEnabled && sourcesLoaded && isDark() && !isReduced()) {
+        const segmentEnd = 0.56;
+        if (progress <= segmentEnd) {
+          const localProgress = progress / segmentEnd;
+          const startTime = heroVideo.duration * 0.5;
+          const endTime = Math.max(startTime + 0.01, heroVideo.duration - 0.08);
+          const targetTime = startTime + (endTime - startTime) * localProgress;
+          const current = Number.isFinite(heroVideo.currentTime) ? heroVideo.currentTime : targetTime;
+          const eased = current + (targetTime - current) * 0.18;
+          try {
+            heroVideo.currentTime = Math.max(0, Math.min(heroVideo.duration, eased));
+          } catch {
+            scrollPlayEnabled = false;
+            void heroVideo.play().catch(() => {});
+          }
+          heroVideo.pause();
+        } else if (heroVideo.paused) {
           void heroVideo.play().catch(() => {});
         }
-      } else if (sourcesLoaded && isDark() && progress >= 1 && !isReduced()) {
-        heroVideo.loop = true;
+      } else if (sourcesLoaded && isDark() && heroVideo.paused && !isReduced()) {
         void heroVideo.play().catch(() => {});
       }
     };
