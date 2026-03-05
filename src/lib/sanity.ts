@@ -1,4 +1,5 @@
 import { createClient } from '@sanity/client';
+import { getPerspectiveFromRequest, isDraftModeEnabled } from './draftMode';
 
 function requiredAny(names: string[]): string {
   for (const name of names) {
@@ -29,16 +30,21 @@ export const sanityClient = createClient({
   }
 });
 
-export async function sanityFetch<T>(query: string, params: Record<string, any> = {}): Promise<T> {
-  const visualEditingEnabled =
-    import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true' || import.meta.env.DEV;
+export async function sanityFetch<T>(
+  query: string,
+  params: Record<string, any> = {},
+  options: { request?: Request } = {}
+): Promise<T> {
+  const draftModeEnabled = isDraftModeEnabled(options.request);
+  const visualEditingEnabled = draftModeEnabled;
+  const perspective = getPerspectiveFromRequest(options.request);
 
   if (visualEditingEnabled && !sanityConfig.token) {
     throw new Error('Missing SANITY_READ_TOKEN while visual editing is enabled.');
   }
 
   return sanityClient.fetch<T>(query, params, {
-    perspective: visualEditingEnabled ? 'drafts' : 'published',
+    perspective,
     stega: {
       enabled: visualEditingEnabled,
       studioUrl: sanityConfig.studioUrl

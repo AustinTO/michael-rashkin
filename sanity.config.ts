@@ -82,7 +82,11 @@ export default defineConfig({
     presentationTool({
       allowOrigins: presentationAllowOrigins,
       previewUrl: {
-        origin: previewOrigin
+        origin: previewOrigin,
+        previewMode: {
+          enable: '/api/draft-mode/enable',
+          disable: '/api/draft-mode/disable'
+        }
       }
     })
   ],

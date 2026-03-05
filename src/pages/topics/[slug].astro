@@ -18,10 +18,10 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const topic = await sanityFetch<Topic>(Q.topicBySlug, { slug });
+const topic = await sanityFetch<Topic>(Q.topicBySlug, { slug }, { request: Astro.request });
 
 const related = topic?._id
-  ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: topic._id }).catch(() => [])
+  ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: topic._id }, { request: Astro.request }).catch(() => [])
   : [];
 
 const updated = topic.updatedAt || topic.publishedAt;

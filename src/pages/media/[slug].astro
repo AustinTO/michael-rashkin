@@ -18,14 +18,14 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const ep = await sanityFetch<MediaEpisode>(Q.mediaBySlug, { slug });
+const ep = await sanityFetch<MediaEpisode>(Q.mediaBySlug, { slug }, { request: Astro.request });
 
 const transcriptHtml = portableTextToHtml(ep.transcript);
 const date = ep.updatedAt || ep.publishedAt;
 const embedUrl = normalizeEmbedUrl(ep.embedUrl);
 
 const relatedRaw = ep.primaryTopic?._id
-  ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: ep.primaryTopic._id }).catch(() => [])
+  ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: ep.primaryTopic._id }, { request: Astro.request }).catch(() => [])
   : [];
 
 const related = relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6);

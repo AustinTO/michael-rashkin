@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const post = await sanityFetch<Insight>(Q.insightBySlug, { slug });
+const post = await sanityFetch<Insight>(Q.insightBySlug, { slug }, { request: Astro.request });
 
 const html = portableTextToHtml(post.body);
 const date = post.updatedAt || post.publishedAt;
@@ -28,7 +28,7 @@ const evidenceTier = post.contentType === 'Evidence Brief'
       : 'Interpretive';
 
 const relatedRaw = post.primaryTopic?._id
-  ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: post.primaryTopic._id }).catch(() => [])
+  ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: post.primaryTopic._id }, { request: Astro.request }).catch(() => [])
   : [];
 
 const related = relatedRaw.filter((i) => i._id !== post._id).slice(0, 6);

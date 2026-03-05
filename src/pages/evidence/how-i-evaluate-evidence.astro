@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getContentPage } from '../../lib/cmsPage';
 
-const { page, html } = await getContentPage('/evidence/how-i-evaluate-evidence');
+const { page, html } = await getContentPage('/evidence/how-i-evaluate-evidence', Astro.request);
 ---
 <BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">

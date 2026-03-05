@@ -11,10 +11,10 @@ import { getContentPage } from '../lib/cmsPage';
 import { urlFor } from '../lib/image';
 import type { ContentCardItem, SiteSettings, Topic } from '../lib/types';
 
-const { page, html } = await getContentPage('/');
-const settings = await sanityFetch<SiteSettings | null>(Q.siteSettings).catch(() => null);
+const { page, html } = await getContentPage('/', Astro.request);
+const settings = await sanityFetch<SiteSettings | null>(Q.siteSettings, {}, { request: Astro.request }).catch(() => null);
 
-const latest = await sanityFetch<ContentCardItem[]>(Q.latestContent).catch(() => []);
+const latest = await sanityFetch<ContentCardItem[]>(Q.latestContent, {}, { request: Astro.request }).catch(() => []);
 const media = latest.filter((i) => i._type === 'mediaEpisode').slice(0, 2);
 const insights = latest.filter((i) => i._type === 'insight').slice(0, 3);
 const policy = latest.filter((i) => i._type === 'policyNote').slice(0, 1);

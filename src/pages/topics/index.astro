@@ -7,8 +7,8 @@ import { Q } from '../../lib/queries';
 import { getContentPage } from '../../lib/cmsPage';
 import type { Topic } from '../../lib/types';
 
-const { page, html } = await getContentPage('/topics');
-const topics = await sanityFetch<Topic[]>(Q.allTopics).catch(() => []);
+const { page, html } = await getContentPage('/topics', Astro.request);
+const topics = await sanityFetch<Topic[]>(Q.allTopics, {}, { request: Astro.request }).catch(() => []);
 ---
 <BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">

@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getLegalPage } from '../lib/cmsPage';
 
-const { page, html } = await getLegalPage('cookies');
+const { page, html } = await getLegalPage('cookies', Astro.request);
 ---
 <BaseLayout title={`${page.title} — Michael Rashkin`} description={page.title}>
   <section class="container" style="padding-top: 38px;">
