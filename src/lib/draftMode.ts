@@ -86,7 +86,11 @@ export function isPresentationRequest(request?: Request): boolean {
 }
 
 export function shouldUseDrafts(request?: Request): boolean {
-  return isDraftModeEnabled(request) && isPresentationRequest(request);
+  if (!isDraftModeEnabled(request)) return false;
+  // In production we rely on the preview cookie session itself (cross-site cookies are partitioned).
+  // In local dev, keep the stricter presentation request heuristic to avoid accidental draft leaks.
+  if (process.env.NODE_ENV === 'production') return true;
+  return isPresentationRequest(request);
 }
 
 export function getPerspectiveFromRequest(request?: Request): Perspective {
