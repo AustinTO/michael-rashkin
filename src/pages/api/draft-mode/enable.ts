@@ -1,5 +1,5 @@
-import { sanityClient, sanityConfig } from '../../../../lib/sanity';
-import { enableDraftMode } from '../../../../lib/draftMode';
+import { sanityClient, sanityConfig } from '../../../lib/sanity';
+import { enableDraftMode } from '../../../lib/draftMode';
 
 export async function GET({ request }: { request: Request }) {
   if (!sanityConfig.token) {
