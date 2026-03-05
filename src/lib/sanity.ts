@@ -1,5 +1,5 @@
 import { createClient } from '@sanity/client';
-import { getPerspectiveFromRequest, isDraftModeEnabled } from './draftMode';
+import { getPerspectiveFromRequest, shouldUseDrafts } from './draftMode';
 
 function requiredAny(names: string[]): string {
   for (const name of names) {
@@ -35,8 +35,7 @@ export async function sanityFetch<T>(
   params: Record<string, any> = {},
   options: { request?: Request } = {}
 ): Promise<T> {
-  const draftModeEnabled = isDraftModeEnabled(options.request);
-  const visualEditingEnabled = draftModeEnabled;
+  const visualEditingEnabled = shouldUseDrafts(options.request);
   const perspective = getPerspectiveFromRequest(options.request);
 
   if (visualEditingEnabled && !sanityConfig.token) {

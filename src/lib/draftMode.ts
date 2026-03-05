@@ -70,8 +70,21 @@ export function isDraftModeEnabled(request?: Request): boolean {
   return cookies.get(COOKIE_DRAFT_MODE) === '1';
 }
 
+export function isPresentationRequest(request?: Request): boolean {
+  if (!request) return false;
+  const secFetchDest = request.headers.get('sec-fetch-dest');
+  const referer = request.headers.get('referer') || '';
+  const url = new URL(request.url);
+  const hasPreviewPerspective = url.searchParams.has(URL_PARAM_PERSPECTIVE);
+  return secFetchDest === 'iframe' || /\/studio(\/|$)/i.test(referer) || hasPreviewPerspective;
+}
+
+export function shouldUseDrafts(request?: Request): boolean {
+  return isDraftModeEnabled(request) && isPresentationRequest(request);
+}
+
 export function getPerspectiveFromRequest(request?: Request): Perspective {
-  if (!isDraftModeEnabled(request)) return 'published';
+  if (!shouldUseDrafts(request)) return 'published';
   const cookies = parseCookies(request);
   const raw = cookies.get(COOKIE_PREVIEW_PERSPECTIVE);
   return raw?.includes('published') ? 'published' : 'drafts';
