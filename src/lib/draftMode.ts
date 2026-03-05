@@ -78,23 +78,36 @@ export function isDraftModeEnabled(request?: Request): boolean {
 
 export function isPresentationRequest(request?: Request): boolean {
   if (!request) return false;
-  const secFetchDest = request.headers.get('sec-fetch-dest');
   const referer = request.headers.get('referer') || '';
   const url = new URL(request.url);
   const hasPreviewPerspective = url.searchParams.has(URL_PARAM_PERSPECTIVE);
-  return secFetchDest === 'iframe' || /\/studio(\/|$)/i.test(referer) || hasPreviewPerspective;
+  const hasPreviewSecret = url.searchParams.has(URL_PARAM_SECRET);
+  return /\/studio(\/|$)/i.test(referer) || hasPreviewPerspective || hasPreviewSecret;
 }
 
 export function shouldUseDrafts(request?: Request): boolean {
-  if (!isDraftModeEnabled(request)) return false;
-  // In production we rely on the preview cookie session itself (cross-site cookies are partitioned).
-  // In local dev, keep the stricter presentation request heuristic to avoid accidental draft leaks.
-  if (process.env.NODE_ENV === 'production') return true;
-  return isPresentationRequest(request);
+  const url = request ? new URL(request.url) : null;
+  const hasPreviewParams =
+    !!url && (url.searchParams.has(URL_PARAM_SECRET) || url.searchParams.has(URL_PARAM_PERSPECTIVE));
+  if (hasPreviewParams) return true;
+  if (isDraftModeEnabled(request)) {
+    // In production we rely on the preview cookie session itself (cross-site cookies are partitioned).
+    // In local dev, keep the stricter presentation request heuristic to avoid accidental draft leaks.
+    if (process.env.NODE_ENV === 'production') return true;
+    return isPresentationRequest(request);
+  }
+
+  // Fallback for embedded Sanity-hosted Presentation when third-party cookies are blocked.
+  if (process.env.NODE_ENV === 'production' && isPresentationRequest(request)) return true;
+  return false;
 }
 
 export function getPerspectiveFromRequest(request?: Request): Perspective {
   if (!shouldUseDrafts(request)) return 'published';
+  const url = request ? new URL(request.url) : null;
+  const queryPerspective = url?.searchParams.get(URL_PARAM_PERSPECTIVE);
+  if (queryPerspective?.includes('published')) return 'published';
+  if (queryPerspective?.includes('drafts')) return 'drafts';
   const cookies = parseCookies(request);
   const raw = cookies.get(COOKIE_PREVIEW_PERSPECTIVE);
   return raw?.includes('published') ? 'published' : 'drafts';
