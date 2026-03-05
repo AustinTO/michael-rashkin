@@ -18,19 +18,30 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const ep = await sanityFetch<MediaEpisode>(Q.mediaBySlug, { slug }, { request: Astro.request });
+const ep = await sanityFetch<MediaEpisode | null>(Q.mediaBySlug, { slug }, { request: Astro.request });
 
-const transcriptHtml = portableTextToHtml(ep.transcript);
-const date = ep.updatedAt || ep.publishedAt;
-const embedUrl = normalizeEmbedUrl(ep.embedUrl);
+if (!ep) {
+  Astro.response.status = 404;
+}
 
-const relatedRaw = ep.primaryTopic?._id
+const transcriptHtml = ep ? portableTextToHtml(ep.transcript) : '';
+const date = ep ? (ep.updatedAt || ep.publishedAt) : undefined;
+const embedUrl = ep ? normalizeEmbedUrl(ep.embedUrl) : '';
+
+const relatedRaw = ep?.primaryTopic?._id
   ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: ep.primaryTopic._id }, { request: Astro.request }).catch(() => [])
   : [];
 
-const related = relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6);
+const related = ep ? relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6) : [];
 ---
-<BaseLayout title={`${ep.title} — Michael Rashkin`} description={ep.shortDescription || ep.title}>
+<BaseLayout title={`${ep?.title || 'Media episode not found'} — Michael Rashkin`} description={ep?.shortDescription || ep?.title || 'Media episode not found'}>
+  {!ep ? (
+    <section class="container">
+      <h1>Media episode not found</h1>
+      <p class="muted">This draft or page may not be available in the current perspective.</p>
+    </section>
+  ) : (
+  <>
   <section class="container" style="padding-top: 38px;">
     <div class="prose">
       <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
@@ -125,4 +136,6 @@ const related = relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6);
   <section class="container" style="padding-top: 28px;">
     <NewsletterSignup />
   </section>
+  </>
+  )}
 </BaseLayout>

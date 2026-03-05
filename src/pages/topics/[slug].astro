@@ -18,22 +18,33 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const topic = await sanityFetch<Topic>(Q.topicBySlug, { slug }, { request: Astro.request });
+const topic = await sanityFetch<Topic | null>(Q.topicBySlug, { slug }, { request: Astro.request });
+
+if (!topic) {
+  Astro.response.status = 404;
+}
 
 const related = topic?._id
   ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: topic._id }, { request: Astro.request }).catch(() => [])
   : [];
 
-const updated = topic.updatedAt || topic.publishedAt;
+const updated = topic ? (topic.updatedAt || topic.publishedAt) : undefined;
 
 const sections = {
-  body: portableTextToHtml(topic.body),
-  whatWeKnow: portableTextToHtml(topic.whatWeKnow),
-  whatWeDontKnowYet: portableTextToHtml(topic.whatWeDontKnowYet),
-  myInterpretation: portableTextToHtml(topic.myInterpretation)
+  body: topic ? portableTextToHtml(topic.body) : '',
+  whatWeKnow: topic ? portableTextToHtml(topic.whatWeKnow) : '',
+  whatWeDontKnowYet: topic ? portableTextToHtml(topic.whatWeDontKnowYet) : '',
+  myInterpretation: topic ? portableTextToHtml(topic.myInterpretation) : ''
 };
 ---
-<BaseLayout title={`${topic.title} — Michael Rashkin`} description={topic.intro || `Topic: ${topic.title}`}>
+<BaseLayout title={`${topic?.title || 'Topic not found'} — Michael Rashkin`} description={topic?.intro || `Topic: ${topic?.title || 'Not found'}`}>
+  {!topic ? (
+    <section class="container">
+      <h1>Topic not found</h1>
+      <p class="muted">This draft or page may not be available in the current perspective.</p>
+    </section>
+  ) : (
+  <>
   <section class="container" style="padding-top: 38px;">
     <div class="prose">
       <h1 style="margin-bottom: 10px;">{topic.title}</h1>
@@ -182,4 +193,6 @@ const sections = {
   <section class="container" style="padding-top: 28px;">
     <NewsletterSignup />
   </section>
+  </>
+  )}
 </BaseLayout>

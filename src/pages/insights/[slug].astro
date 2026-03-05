@@ -15,25 +15,38 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const post = await sanityFetch<Insight>(Q.insightBySlug, { slug }, { request: Astro.request });
+const post = await sanityFetch<Insight | null>(Q.insightBySlug, { slug }, { request: Astro.request });
 
-const html = portableTextToHtml(post.body);
-const date = post.updatedAt || post.publishedAt;
-const evidenceTier = post.contentType === 'Evidence Brief'
-  ? 'Tier 1 dominant'
-  : post.contentType === 'Deep Dive'
-    ? 'Tier 2 dominant'
-    : post.contentType === 'Myth Check'
-      ? 'Tier 2-3 mixed'
-      : 'Interpretive';
+if (!post) {
+  Astro.response.status = 404;
+}
 
-const relatedRaw = post.primaryTopic?._id
+const html = post ? portableTextToHtml(post.body) : '';
+const date = post ? (post.updatedAt || post.publishedAt) : undefined;
+const evidenceTier = !post
+  ? ''
+  : post.contentType === 'Evidence Brief'
+    ? 'Tier 1 dominant'
+    : post.contentType === 'Deep Dive'
+      ? 'Tier 2 dominant'
+      : post.contentType === 'Myth Check'
+        ? 'Tier 2-3 mixed'
+        : 'Interpretive';
+
+const relatedRaw = post?.primaryTopic?._id
   ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: post.primaryTopic._id }, { request: Astro.request }).catch(() => [])
   : [];
 
-const related = relatedRaw.filter((i) => i._id !== post._id).slice(0, 6);
+const related = post ? relatedRaw.filter((i) => i._id !== post._id).slice(0, 6) : [];
 ---
-<BaseLayout title={`${post.title} — Michael Rashkin`} description={post.summaryBullets?.[0] || post.title}>
+<BaseLayout title={`${post?.title || 'Insight not found'} — Michael Rashkin`} description={post?.summaryBullets?.[0] || post?.title || 'Insight not found'}>
+  {!post ? (
+    <section class="container">
+      <h1>Insight not found</h1>
+      <p class="muted">This draft or page may not be available in the current perspective.</p>
+    </section>
+  ) : (
+  <>
   <section class="container">
     <ArticleShell
       title={post.title}
@@ -72,4 +85,6 @@ const related = relatedRaw.filter((i) => i._id !== post._id).slice(0, 6);
       </div>
     </section>
   ) : null}
+  </>
+  )}
 </BaseLayout>

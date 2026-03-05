@@ -15,18 +15,29 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const post = await sanityFetch<PolicyNote>(Q.policyBySlug, { slug }, { request: Astro.request });
+const post = await sanityFetch<PolicyNote | null>(Q.policyBySlug, { slug }, { request: Astro.request });
 
-const html = portableTextToHtml(post.body);
-const date = post.updatedAt || post.publishedAt;
+if (!post) {
+  Astro.response.status = 404;
+}
 
-const relatedRaw = post.primaryTopic?._id
+const html = post ? portableTextToHtml(post.body) : '';
+const date = post ? (post.updatedAt || post.publishedAt) : undefined;
+
+const relatedRaw = post?.primaryTopic?._id
   ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: post.primaryTopic._id }, { request: Astro.request }).catch(() => [])
   : [];
 
-const related = relatedRaw.filter((i) => i._id !== post._id).slice(0, 6);
+const related = post ? relatedRaw.filter((i) => i._id !== post._id).slice(0, 6) : [];
 ---
-<BaseLayout title={`${post.title} — Michael Rashkin`} description={post.summaryBullets?.[0] || post.title}>
+<BaseLayout title={`${post?.title || 'Policy note not found'} — Michael Rashkin`} description={post?.summaryBullets?.[0] || post?.title || 'Policy note not found'}>
+  {!post ? (
+    <section class="container">
+      <h1>Policy note not found</h1>
+      <p class="muted">This draft or page may not be available in the current perspective.</p>
+    </section>
+  ) : (
+  <>
   <section class="container">
     <ArticleShell
       title={post.title}
@@ -65,4 +76,6 @@ const related = relatedRaw.filter((i) => i._id !== post._id).slice(0, 6);
       </div>
     </section>
   ) : null}
+  </>
+  )}
 </BaseLayout>

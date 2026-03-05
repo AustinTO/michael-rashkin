@@ -78,11 +78,12 @@ export function isDraftModeEnabled(request?: Request): boolean {
 
 export function isPresentationRequest(request?: Request): boolean {
   if (!request) return false;
+  const secFetchDest = request.headers.get('sec-fetch-dest');
   const referer = request.headers.get('referer') || '';
   const url = new URL(request.url);
   const hasPreviewPerspective = url.searchParams.has(URL_PARAM_PERSPECTIVE);
   const hasPreviewSecret = url.searchParams.has(URL_PARAM_SECRET);
-  return /\/studio(\/|$)/i.test(referer) || hasPreviewPerspective || hasPreviewSecret;
+  return secFetchDest === 'iframe' || /\/studio(\/|$)/i.test(referer) || hasPreviewPerspective || hasPreviewSecret;
 }
 
 export function shouldUseDrafts(request?: Request): boolean {
