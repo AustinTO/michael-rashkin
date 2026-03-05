@@ -23,13 +23,17 @@ function parseCookies(request?: Request): Map<string, string> {
 }
 
 function toSetCookie(name: string, value: string, maxAgeSeconds: number): string {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}${secure}`;
+  const isProd = process.env.NODE_ENV === 'production';
+  const sameSite = isProd ? 'None' : 'Lax';
+  const secure = isProd ? '; Secure' : '';
+  return `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=${maxAgeSeconds}${secure}`;
 }
 
 function clearCookie(name: string): string {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `${name}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`;
+  const isProd = process.env.NODE_ENV === 'production';
+  const sameSite = isProd ? 'None' : 'Lax';
+  const secure = isProd ? '; Secure' : '';
+  return `${name}=; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=0${secure}`;
 }
 
 function parsePreviewRequest(unsafeUrl: string): {
