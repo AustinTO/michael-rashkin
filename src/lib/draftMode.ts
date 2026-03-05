@@ -26,14 +26,16 @@ function toSetCookie(name: string, value: string, maxAgeSeconds: number): string
   const isProd = process.env.NODE_ENV === 'production';
   const sameSite = isProd ? 'None' : 'Lax';
   const secure = isProd ? '; Secure' : '';
-  return `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=${maxAgeSeconds}${secure}`;
+  const partitioned = isProd ? '; Partitioned' : '';
+  return `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=${maxAgeSeconds}${secure}${partitioned}`;
 }
 
 function clearCookie(name: string): string {
   const isProd = process.env.NODE_ENV === 'production';
   const sameSite = isProd ? 'None' : 'Lax';
   const secure = isProd ? '; Secure' : '';
-  return `${name}=; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=0${secure}`;
+  const partitioned = isProd ? '; Partitioned' : '';
+  return `${name}=; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=0${secure}${partitioned}`;
 }
 
 function parsePreviewRequest(unsafeUrl: string): {
