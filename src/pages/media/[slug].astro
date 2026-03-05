@@ -10,6 +10,7 @@ import { sanityFetch } from '../../lib/sanity';
 import { Q } from '../../lib/queries';
 import { portableTextToHtml } from '../../lib/portableText';
 import { normalizeEmbedUrl } from '../../lib/embed';
+import { urlFor } from '../../lib/image';
 import type { ContentCardItem, MediaEpisode } from '../../lib/types';
 
 export async function getStaticPaths() {
@@ -27,6 +28,7 @@ if (!ep) {
 const transcriptHtml = ep ? portableTextToHtml(ep.transcript) : '';
 const date = ep ? (ep.updatedAt || ep.publishedAt) : undefined;
 const embedUrl = ep ? normalizeEmbedUrl(ep.embedUrl) : '';
+const heroImageUrl = ep?.heroImage ? urlFor(ep.heroImage).width(1600).height(900).fit('crop').quality(82).format('webp').url() : null;
 
 const relatedRaw = ep?.primaryTopic?._id
   ? await sanityFetch<ContentCardItem[]>(Q.relatedByTopicId, { topicId: ep.primaryTopic._id }, { request: Astro.request }).catch(() => [])
@@ -53,6 +55,15 @@ const related = ep ? relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6) : []
 
       <h1 style="margin-top: 12px;">{ep.title}</h1>
 
+      {heroImageUrl ? (
+        <img
+          src={heroImageUrl}
+          alt={ep.heroImageAlt || ep.title}
+          loading="eager"
+          class="article-hero"
+        />
+      ) : null}
+
       <div class="embed" style="margin-top: 14px;">
         <iframe
           src={embedUrl}
@@ -73,6 +84,14 @@ const related = ep ? relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6) : []
           background: var(--bg-main);
         }
         iframe { width: 100%; height: 100%; border: 0; }
+        .article-hero {
+          width: 100%;
+          display: block;
+          border-radius: var(--radius-lg);
+          border: 1px solid var(--border);
+          margin-top: 14px;
+          object-fit: cover;
+        }
       </style>
     </div>
   </section>
@@ -127,6 +146,8 @@ const related = ep ? relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6) : []
             contentType={item.contentType}
             date={item.date}
             excerpt={item.excerpt}
+            image={item.heroImage}
+            imageAlt={item.heroImageAlt}
           />
         ))}
       </div>

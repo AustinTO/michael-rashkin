@@ -35,7 +35,7 @@ export default defineType({
       name: 'body',
       title: 'Pillar body (optional intro content)',
       type: 'array',
-      of: [{ type: 'block' }]
+      of: [{ type: 'block' }, { type: 'portableImage' }]
     }),
 
     defineField({
@@ -48,19 +48,19 @@ export default defineType({
       name: 'whatWeKnow',
       title: 'What we know',
       type: 'array',
-      of: [{ type: 'block' }]
+      of: [{ type: 'block' }, { type: 'portableImage' }]
     }),
     defineField({
       name: 'whatWeDontKnowYet',
       title: 'What we don’t know yet',
       type: 'array',
-      of: [{ type: 'block' }]
+      of: [{ type: 'block' }, { type: 'portableImage' }]
     }),
     defineField({
       name: 'myInterpretation',
       title: 'My interpretation (labeled opinion)',
       type: 'array',
-      of: [{ type: 'block' }]
+      of: [{ type: 'block' }, { type: 'portableImage' }]
     }),
 
     defineField({

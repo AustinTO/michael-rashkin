@@ -10,6 +10,7 @@ import LabelPill from '../../components/LabelPill.astro';
 import { sanityFetch } from '../../lib/sanity';
 import { Q } from '../../lib/queries';
 import { portableTextToHtml } from '../../lib/portableText';
+import { urlFor } from '../../lib/image';
 import type { ContentCardItem, Topic } from '../../lib/types';
 
 export async function getStaticPaths() {
@@ -29,6 +30,7 @@ const related = topic?._id
   : [];
 
 const updated = topic ? (topic.updatedAt || topic.publishedAt) : undefined;
+const heroImageUrl = topic?.heroImage ? urlFor(topic.heroImage).width(1600).height(900).fit('crop').quality(82).format('webp').url() : null;
 
 const sections = {
   body: topic ? portableTextToHtml(topic.body) : '',
@@ -52,6 +54,15 @@ const sections = {
       <div style="margin-top: 10px;">
         <UpdatedBadge date={updated} prefix="Updated on" />
       </div>
+
+      {heroImageUrl ? (
+        <img
+          src={heroImageUrl}
+          alt={topic.title}
+          loading="eager"
+          class="topic-hero"
+        />
+      ) : null}
 
       {sections.body ? (
         <div class="prose" style="margin-top: 18px;" set:html={sections.body} />
@@ -145,7 +156,9 @@ const sections = {
           contentType={item.contentType}
           date={item.date}
           excerpt={item.excerpt}
-        />
+            image={item.heroImage}
+            imageAlt={item.heroImageAlt}
+          />
       )) : (
         <div class="card" style="grid-column: 1 / -1;">
           <div style="font-weight: 900;">No related content yet</div>
@@ -196,3 +209,15 @@ const sections = {
   </>
   )}
 </BaseLayout>
+
+<style>
+  .topic-hero {
+    width: 100%;
+    max-width: var(--content);
+    display: block;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    margin: 14px 0 6px;
+    object-fit: cover;
+  }
+</style>

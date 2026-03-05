@@ -58,7 +58,7 @@ export default defineType({
       name: 'body',
       title: 'Body',
       type: 'array',
-      of: [{ type: 'block' }]
+      of: [{ type: 'block' }, { type: 'portableImage' }]
     }),
     defineField({
       name: 'sources',

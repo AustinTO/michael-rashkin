@@ -2,22 +2,29 @@
 import Card from './Card.astro';
 import LabelPill from './LabelPill.astro';
 import { formatDate } from '../lib/dates';
+import { urlFor } from '../lib/image';
 
 const {
   href,
   title,
   contentType,
   date,
-  excerpt
+  excerpt,
+  image,
+  imageAlt
 } = Astro.props as {
   href: string;
   title: string;
   contentType: string;
   date?: string;
   excerpt?: string;
+  image?: any;
+  imageAlt?: string;
 };
+const imageUrl = image ? urlFor(image).width(900).height(520).fit('crop').quality(80).format('webp').url() : null;
 ---
 <Card class="card-link reveal" href={href}>
+  {imageUrl ? <img src={imageUrl} alt={imageAlt || title} loading="lazy" class="card-image" /> : null}
   <div class="row">
     <LabelPill label={contentType} />
     {date ? <span class="meta-badge">{formatDate(date)}</span> : <span />}
@@ -34,6 +41,15 @@ const {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+  }
+  .card-image {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
   }
   .title {
     margin-top: 14px;

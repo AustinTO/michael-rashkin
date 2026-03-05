@@ -105,6 +105,8 @@ export type ContentCardItem = {
   contentType: CardContentType;
   date?: string;
   excerpt?: string;
+  heroImage?: any;
+  heroImageAlt?: string;
   topic?: { title: string; slug: string };
 };
 

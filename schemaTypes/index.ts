@@ -12,6 +12,7 @@ import siteSettings from './siteSettings';
 import evidenceSnapshot from './objects/evidenceSnapshot';
 import sourceReference from './objects/sourceReference';
 import timestampItem from './objects/timestampItem';
+import portableImage from './objects/portableImage';
 
 export const schemaTypes = [
   // documents
@@ -28,5 +29,6 @@ export const schemaTypes = [
   // objects
   evidenceSnapshot,
   sourceReference,
-  timestampItem
+  timestampItem,
+  portableImage
 ];

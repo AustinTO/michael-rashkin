@@ -7,6 +7,7 @@ import ContentCard from '../../components/ContentCard.astro';
 import { sanityFetch } from '../../lib/sanity';
 import { Q } from '../../lib/queries';
 import { portableTextToHtml } from '../../lib/portableText';
+import { urlFor } from '../../lib/image';
 import type { ContentCardItem, Insight } from '../../lib/types';
 
 export async function getStaticPaths() {
@@ -23,6 +24,7 @@ if (!post) {
 
 const html = post ? portableTextToHtml(post.body) : '';
 const date = post ? (post.updatedAt || post.publishedAt) : undefined;
+const heroImageUrl = post?.heroImage ? urlFor(post.heroImage).width(1600).height(900).fit('crop').quality(82).format('webp').url() : null;
 const evidenceTier = !post
   ? ''
   : post.contentType === 'Evidence Brief'
@@ -57,6 +59,14 @@ const related = post ? relatedRaw.filter((i) => i._id !== post._id).slice(0, 6) 
       ]}
       corrections={date ? [`${new Date(date).toISOString().slice(0, 10)}: Last content update published.`] : []}
     >
+      {heroImageUrl ? (
+        <img
+          src={heroImageUrl}
+          alt={post.title}
+          loading="eager"
+          class="insight-hero"
+        />
+      ) : null}
       {post.summaryBullets?.length ? (
         <ul>
           {post.summaryBullets.map((b) => (<li>{b}</li>))}
@@ -80,6 +90,8 @@ const related = post ? relatedRaw.filter((i) => i._id !== post._id).slice(0, 6) 
             contentType={item.contentType}
             date={item.date}
             excerpt={item.excerpt}
+            image={item.heroImage}
+            imageAlt={item.heroImageAlt}
           />
         ))}
       </div>
@@ -88,3 +100,15 @@ const related = post ? relatedRaw.filter((i) => i._id !== post._id).slice(0, 6) 
   </>
   )}
 </BaseLayout>
+
+<style>
+  .insight-hero {
+    width: 100%;
+    max-width: var(--content);
+    display: block;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    margin: 0 0 18px;
+    object-fit: cover;
+  }
+</style>

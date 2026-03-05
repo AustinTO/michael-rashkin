@@ -68,7 +68,7 @@ export default defineType({
       name: 'transcript',
       title: 'Transcript (rich text)',
       type: 'array',
-      of: [{ type: 'block' }]
+      of: [{ type: 'block' }, { type: 'portableImage' }]
     }),
     defineField({
       name: 'sources',

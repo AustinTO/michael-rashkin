@@ -16,7 +16,15 @@ const items = await sanityFetch<ContentCardItem[]>(Q.allPolicyNotes, {}, { reque
 
     <div class="grid grid-3" style="margin-top: 14px;">
       {items.map((item) => (
-        <ContentCard href={`/policy/${item.slug}`} title={item.title} contentType={item.contentType} date={item.date} excerpt={item.excerpt} />
+        <ContentCard
+          href={`/policy/${item.slug}`}
+          title={item.title}
+          contentType={item.contentType}
+          date={item.date}
+          excerpt={item.excerpt}
+          image={item.heroImage}
+          imageAlt={item.heroImageAlt}
+        />
       ))}
     </div>
   </section>
