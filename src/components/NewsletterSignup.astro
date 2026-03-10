@@ -1,6 +1,4 @@
 ---
-const action = process.env.PUBLIC_NEWSLETTER_FORM_ACTION;
-const disabled = !action;
 const { title = 'Get one evidence-based brief per week.', body = 'No spam. Just clear analysis, sources, and updates when I change my mind.' } = Astro.props as {
   title?: string;
   body?: string;
@@ -10,21 +8,43 @@ const { title = 'Get one evidence-based brief per week.', body = 'No spam. Just 
   <div class="header">{title}</div>
   <div class="muted">{body}</div>
 
-  <form class="form" method="post" action={action || undefined}>
-    <input class="input" type="email" name="email" placeholder="you@example.com" required disabled={disabled} />
-    <button class="button primary" type="submit" disabled={disabled}>Subscribe</button>
+  <form class="form" method="post" action="/.netlify/functions/subscribe" data-newsletter-form>
+    <input class="input" type="email" name="email" placeholder="you@example.com" required />
+    <div class="cf-turnstile" data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}></div>
+    <button class="button primary" type="submit">Subscribe</button>
   </form>
 
-  {disabled ? (
-    <p class="small muted" style="margin-top: 10px;">
-      Set <span class="kbd">PUBLIC_NEWSLETTER_FORM_ACTION</span> in <span class="kbd">.env</span> to connect your provider.
-    </p>
-  ) : (
-    <p class="small muted" style="margin-top: 10px;">
-      By subscribing you agree to receive emails. Unsubscribe anytime.
-    </p>
-  )}
+  <p class="small muted" style="margin-top: 10px;">
+    By subscribing you agree to receive emails. Unsubscribe anytime.
+  </p>
 </section>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  const forms = document.querySelectorAll('[data-newsletter-form]');
+
+  for (const form of forms) {
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const emailValue = formData.get('email');
+      const tokenValue = formData.get('cf-turnstile-response');
+      const email = typeof emailValue === 'string' ? emailValue.trim() : '';
+      const token = typeof tokenValue === 'string' ? tokenValue : '';
+
+      if (!email || !token) return;
+
+      const response = await fetch('/.netlify/functions/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, token })
+      });
+
+      if (response.ok) form.reset();
+    });
+  }
+</script>
 
 <style>
   .newsletter {

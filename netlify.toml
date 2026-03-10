@@ -2,6 +2,15 @@
   command = "pnpm run build"
   publish = "dist"
 
+[functions]
+  directory = "netlify/functions"
+
+[dev]
+  command = "pnpm run dev"
+  targetPort = 4321
+  publish = "dist"
+  functions = "netlify/functions"
+
 [build.environment]
   NODE_VERSION = "22"
   PUBLIC_SANITY_VISUAL_EDITING_ENABLED = "true"

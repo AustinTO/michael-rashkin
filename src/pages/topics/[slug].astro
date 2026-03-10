@@ -38,6 +38,12 @@ const sections = {
   whatWeDontKnowYet: topic ? portableTextToHtml(topic.whatWeDontKnowYet) : '',
   myInterpretation: topic ? portableTextToHtml(topic.myInterpretation) : ''
 };
+
+const hasWhatWeKnow = Boolean(sections.whatWeKnow);
+const hasWhatWeDontKnowYet = Boolean(sections.whatWeDontKnowYet);
+const hasMyInterpretation = Boolean(sections.myInterpretation);
+const hasKeyTakeaways = Boolean(topic?.keyTakeaways?.length);
+const hasAnyTopicSections = hasWhatWeKnow || hasWhatWeDontKnowYet || hasMyInterpretation || hasKeyTakeaways;
 ---
 <BaseLayout title={`${topic?.title || 'Topic not found'} — Michael Rashkin`} description={topic?.intro || `Topic: ${topic?.title || 'Not found'}`}>
   {!topic ? (
@@ -76,30 +82,44 @@ const sections = {
     </div>
   </section>
 
-  <section class="container" style="padding-top: 10px;">
-    <div class="prose">
-      <h2>What we know</h2>
-      {sections.whatWeKnow ? <div set:html={sections.whatWeKnow} /> : <p class="muted">Add content in Sanity to populate this section.</p>}
+  {hasAnyTopicSections ? (
+    <section class="container" style="padding-top: 10px;">
+      <div class="prose">
+        {hasWhatWeKnow ? (
+          <>
+            <h2>What we know</h2>
+            <div set:html={sections.whatWeKnow} />
+          </>
+        ) : null}
 
-      <h2>What we don’t know yet</h2>
-      {sections.whatWeDontKnowYet ? <div set:html={sections.whatWeDontKnowYet} /> : <p class="muted">Add content in Sanity to populate this section.</p>}
+        {hasWhatWeDontKnowYet ? (
+          <>
+            <h2>What we don’t know yet</h2>
+            <div set:html={sections.whatWeDontKnowYet} />
+          </>
+        ) : null}
 
-      <div style="margin-top: 26px; display:flex; align-items:center; gap: 10px;">
-        <h2 style="margin:0;">My interpretation</h2>
-        <LabelPill label="Interpretation / opinion" />
+        {hasMyInterpretation ? (
+          <>
+            <div style="margin-top: 26px; display:flex; align-items:center; gap: 10px;">
+              <h2 style="margin:0;">My interpretation</h2>
+              <LabelPill label="Interpretation / opinion" />
+            </div>
+            <div set:html={sections.myInterpretation} />
+          </>
+        ) : null}
+
+        {hasKeyTakeaways ? (
+          <>
+            <h2>Key takeaways</h2>
+            <ul>
+              {topic.keyTakeaways?.map((k) => (<li>{k}</li>))}
+            </ul>
+          </>
+        ) : null}
       </div>
-      {sections.myInterpretation ? <div set:html={sections.myInterpretation} /> : <p class="muted">Add content in Sanity to populate this section.</p>}
-
-      <h2>Key takeaways</h2>
-      {topic.keyTakeaways?.length ? (
-        <ul>
-          {topic.keyTakeaways.map((k) => (<li>{k}</li>))}
-        </ul>
-      ) : (
-        <p class="muted">Add 3–6 bullets in Sanity.</p>
-      )}
-    </div>
-  </section>
+    </section>
+  ) : null}
 
   <section class="container" style="padding-top: 18px;">
     <div style="max-width: var(--content);">

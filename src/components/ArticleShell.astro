@@ -23,7 +23,6 @@ const {
     ) : null}
     <h1 style="margin-bottom: 8px;">{title}</h1>
     {description ? <p class="muted" style="margin-top: 0;">{description}</p> : null}
-    <button id="reading-toggle" class="button small" style="margin-top: 12px;" type="button">Toggle light reading mode</button>
   </header>
 
   <section>
@@ -41,12 +40,3 @@ const {
     )}
   </section>
 </article>
-
-<script>
-  const btn = document.getElementById('reading-toggle');
-  if (btn) {
-    btn.addEventListener('click', () => {
-      document.body.classList.toggle('reading-light');
-    });
-  }
-</script>
