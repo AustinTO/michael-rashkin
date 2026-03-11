@@ -59,6 +59,8 @@ const presentationAllowOrigins = Array.from(
   new Set([
     ...(isDev ? ['http://localhost:4321'] : []),
     'https://michaelrashkin.com',
+    'https://www.sanity.io',
+    'https://sanity.io',
     netlifyBranchDeployUrl,
     netlifyBranchUrl,
     netlifySiteUrl,
