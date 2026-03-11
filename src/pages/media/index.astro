@@ -5,10 +5,15 @@ import ContentCard from '../../components/ContentCard.astro';
 import { sanityFetch } from '../../lib/sanity';
 import { Q } from '../../lib/queries';
 import { getContentPage } from '../../lib/cmsPage';
+import { getVideoThumbnailFromEmbedUrl } from '../../lib/videoThumbnail';
 import type { ContentCardItem } from '../../lib/types';
 
 const { page, html } = await getContentPage('/media', Astro.request);
 const items = await sanityFetch<ContentCardItem[]>(Q.allMedia, {}, { request: Astro.request }).catch(() => []);
+const cardFallbackImageUrl = (item: ContentCardItem): string | undefined => {
+  if (item.heroImage || item._type !== 'mediaEpisode') return undefined;
+  return getVideoThumbnailFromEmbedUrl(item.embedUrl) || undefined;
+};
 ---
 <BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">
@@ -24,6 +29,7 @@ const items = await sanityFetch<ContentCardItem[]>(Q.allMedia, {}, { request: As
           excerpt={item.excerpt}
           image={item.heroImage}
           imageAlt={item.heroImageAlt}
+          imageUrl={cardFallbackImageUrl(item)}
         />
       ))}
     </div>
