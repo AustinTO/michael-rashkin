@@ -43,7 +43,10 @@ exports.handler = async (event) => {
     if (!verifyResult.success) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Turnstile verification failed' })
+        body: JSON.stringify({
+          error: 'Turnstile verification failed',
+          details: verifyResult['error-codes'] || []
+        })
       };
     }
 
@@ -64,7 +67,10 @@ exports.handler = async (event) => {
       const errorBody = await brevoResponse.text();
       return {
         statusCode: brevoResponse.status,
-        body: JSON.stringify({ error: 'Brevo subscription failed', details: errorBody })
+        body: JSON.stringify({
+          error: brevoResponse.status === 401 ? 'Brevo authorization failed' : 'Brevo subscription failed',
+          details: errorBody
+        })
       };
     }
 

@@ -28,6 +28,7 @@ const turnstileSiteKey = resolveTurnstileSiteKey(import.meta.env.PUBLIC_TURNSTIL
     )}
     <button class="button primary" type="submit">Subscribe</button>
   </form>
+  <p class="small muted" data-newsletter-status aria-live="polite"></p>
 
   <p class="small muted" style="margin-top: 10px;">
     By subscribing you agree to receive emails. Unsubscribe anytime.
@@ -39,8 +40,13 @@ const turnstileSiteKey = resolveTurnstileSiteKey(import.meta.env.PUBLIC_TURNSTIL
   const forms = document.querySelectorAll('[data-newsletter-form]');
 
   for (const form of forms) {
+    const statusEl = form.parentElement?.querySelector('[data-newsletter-status]');
+    const submitButton = form.querySelector('button[type="submit"]');
+    let inFlight = false;
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
+      if (inFlight) return;
 
       const formData = new FormData(form);
       const emailValue = formData.get('email');
@@ -48,15 +54,38 @@ const turnstileSiteKey = resolveTurnstileSiteKey(import.meta.env.PUBLIC_TURNSTIL
       const email = typeof emailValue === 'string' ? emailValue.trim() : '';
       const token = typeof tokenValue === 'string' ? tokenValue : '';
 
-      if (!email || !token) return;
+      if (!email || !token) {
+        if (statusEl instanceof HTMLElement) statusEl.textContent = 'Please complete the verification challenge.';
+        return;
+      }
 
-      const response = await fetch('/.netlify/functions/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, token })
-      });
+      inFlight = true;
+      if (submitButton instanceof HTMLButtonElement) submitButton.disabled = true;
+      if (statusEl instanceof HTMLElement) statusEl.textContent = 'Submitting...';
 
-      if (response.ok) form.reset();
+      try {
+        const response = await fetch('/.netlify/functions/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, token })
+        });
+        const payload = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          form.reset();
+          if (statusEl instanceof HTMLElement) statusEl.textContent = 'Subscribed. Check your inbox for confirmation.';
+        } else if (statusEl instanceof HTMLElement) {
+          statusEl.textContent =
+            typeof payload?.error === 'string'
+              ? payload.error
+              : 'Unable to subscribe right now. Please try again.';
+        }
+      } catch {
+        if (statusEl instanceof HTMLElement) statusEl.textContent = 'Network error. Please try again.';
+      } finally {
+        inFlight = false;
+        if (submitButton instanceof HTMLButtonElement) submitButton.disabled = false;
+      }
     });
   }
 </script>
