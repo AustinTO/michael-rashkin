@@ -47,6 +47,7 @@ export const Q = {
         "slug": slug.current,
         heroImage,
         heroImageAlt,
+        embedUrl,
         "date": coalesce(updatedAt, publishedAt, _updatedAt),
         "contentType": select(
           _type == "mediaEpisode" => "Video",
@@ -109,6 +110,7 @@ export const Q = {
       "slug": slug.current,
       heroImage,
       heroImageAlt,
+      embedUrl,
       "date": coalesce(updatedAt, publishedAt, _updatedAt),
       // Normalize to a single field for UI pills
       "contentType": select(
@@ -129,6 +131,7 @@ export const Q = {
       "slug": slug.current,
       heroImage,
       heroImageAlt,
+      embedUrl,
       contentType,
       publishedAt,
       updatedAt,
@@ -168,6 +171,7 @@ export const Q = {
       "slug": slug.current,
       heroImage,
       heroImageAlt,
+      embedUrl,
       "contentType": "Policy Note",
       policyLens,
       publishedAt,
@@ -255,6 +259,7 @@ export const Q = {
       "slug": slug.current,
       heroImage,
       heroImageAlt,
+      embedUrl,
       "date": coalesce(updatedAt, publishedAt, _updatedAt),
       "contentType": select(
         _type == "mediaEpisode" => "Video",

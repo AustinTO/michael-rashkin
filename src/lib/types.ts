@@ -107,6 +107,7 @@ export type ContentCardItem = {
   excerpt?: string;
   heroImage?: any;
   heroImageAlt?: string;
+  embedUrl?: string;
   topic?: { title: string; slug: string };
 };
 

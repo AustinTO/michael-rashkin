@@ -11,7 +11,8 @@ const {
   date,
   excerpt,
   image,
-  imageAlt
+  imageAlt,
+  imageUrl
 } = Astro.props as {
   href: string;
   title: string;
@@ -20,11 +21,14 @@ const {
   excerpt?: string;
   image?: any;
   imageAlt?: string;
+  imageUrl?: string;
 };
-const imageUrl = image ? urlFor(image).width(900).height(520).fit('crop').quality(80).format('webp').url() : null;
+const resolvedImageUrl = image
+  ? urlFor(image).width(900).height(520).fit('crop').quality(80).format('webp').url()
+  : imageUrl || null;
 ---
 <Card class="card-link reveal" href={href}>
-  {imageUrl ? <img src={imageUrl} alt={imageAlt || title} loading="lazy" class="card-image" /> : null}
+  {resolvedImageUrl ? <img src={resolvedImageUrl} alt={imageAlt || title} loading="lazy" class="card-image" /> : null}
   <div class="row">
     <LabelPill label={contentType} />
     {date ? <span class="meta-badge">{formatDate(date)}</span> : <span />}

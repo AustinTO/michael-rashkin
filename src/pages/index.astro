@@ -9,6 +9,7 @@ import { sanityFetch } from '../lib/sanity';
 import { Q } from '../lib/queries';
 import { getContentPage } from '../lib/cmsPage';
 import { urlFor } from '../lib/image';
+import { getVideoThumbnailFromEmbedUrl } from '../lib/videoThumbnail';
 import type { ContentCardItem, SiteSettings, Topic } from '../lib/types';
 
 const { page, html } = await getContentPage('/', Astro.request);
@@ -26,6 +27,10 @@ const heroActions = settings?.heroActions || [];
 const homePillars = settings?.homePillars || [];
 const heroImageUrl = page?.heroImage ? urlFor(page.heroImage).width(1600).quality(82).url() : null;
 const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
+const cardFallbackImageUrl = (item: ContentCardItem): string | undefined => {
+  if (item.heroImage || item._type !== 'mediaEpisode') return undefined;
+  return getVideoThumbnailFromEmbedUrl(item.embedUrl) || undefined;
+};
 ---
 <BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="hero-wrap">
@@ -140,6 +145,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
           excerpt={item.excerpt}
           image={item.heroImage}
           imageAlt={item.heroImageAlt}
+          imageUrl={cardFallbackImageUrl(item)}
         />
       ))}
     </div>
@@ -156,6 +162,7 @@ const heroImageAlt = page?.heroImageAlt || page?.title || 'Hero image';
           excerpt={item.excerpt}
           image={item.heroImage}
           imageAlt={item.heroImageAlt}
+          imageUrl={cardFallbackImageUrl(item)}
         />
       ))}
     </div>
