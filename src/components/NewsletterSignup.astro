@@ -3,6 +3,17 @@ const { title = 'Get one evidence-based brief per week.', body = 'No spam. Just 
   title?: string;
   body?: string;
 };
+
+function resolveTurnstileSiteKey(value: unknown): string {
+  if (typeof value === 'string') return value.trim();
+  if (!value || typeof value !== 'object') return '';
+
+  const asRecord = value as Record<string, unknown>;
+  const candidate = asRecord.sitekey ?? asRecord.siteKey ?? asRecord.key;
+  return typeof candidate === 'string' ? candidate.trim() : '';
+}
+
+const turnstileSiteKey = resolveTurnstileSiteKey(import.meta.env.PUBLIC_TURNSTILE_SITE_KEY);
 ---
 <section class="card newsletter">
   <div class="header">{title}</div>
@@ -10,7 +21,11 @@ const { title = 'Get one evidence-based brief per week.', body = 'No spam. Just 
 
   <form class="form" method="post" action="/.netlify/functions/subscribe" data-newsletter-form>
     <input class="input" type="email" name="email" placeholder="you@example.com" required />
-    <div class="cf-turnstile" data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}></div>
+    {turnstileSiteKey ? (
+      <div class="cf-turnstile" data-sitekey={turnstileSiteKey}></div>
+    ) : (
+      <p class="small muted">Newsletter signup is temporarily unavailable.</p>
+    )}
     <button class="button primary" type="submit">Subscribe</button>
   </form>
 

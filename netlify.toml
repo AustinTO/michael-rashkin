@@ -16,4 +16,4 @@
   PUBLIC_SANITY_VISUAL_EDITING_ENABLED = "true"
 
 [context.dark-ui-test1.environment]
-  SANITY_STUDIO_PREVIEW_ORIGIN = "https://dark-ui-test1--michaelrashkin.netlify.app"
+  SANITY_STUDIO_PREVIEW_ORIGIN = "https://michaelrashkin.com"
