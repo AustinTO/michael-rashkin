@@ -52,16 +52,17 @@ const configuredPreviewIsLocalhost =
 const netlifyPreviewOrigin = netlifyBranchDeployUrl || netlifyBranchUrl || netlifySiteUrl;
 const previewOrigin = isDev
   ? (configuredPreviewOrigin || 'http://localhost:4321')
-  : netlifyPreviewOrigin ||
-    (!configuredPreviewIsLocalhost ? configuredPreviewOrigin : undefined) ||
-    'https://michaelrashkin.netlify.app';
+  : (!configuredPreviewIsLocalhost ? configuredPreviewOrigin : undefined) ||
+    netlifyPreviewOrigin ||
+    'https://michaelrashkin.com';
 const presentationAllowOrigins = Array.from(
   new Set([
     ...(isDev ? ['http://localhost:4321'] : []),
-    'https://michaelrashkin.netlify.app',
+    'https://michaelrashkin.com',
     netlifyBranchDeployUrl,
     netlifyBranchUrl,
     netlifySiteUrl,
+    (!configuredPreviewIsLocalhost ? configuredPreviewOrigin : undefined),
     previewOrigin
   ].filter((v): v is string => !!v))
 );
@@ -72,7 +73,6 @@ if (!dataset) throw new Error('Missing SANITY_STUDIO_DATASET, PUBLIC_SANITY_DATA
 export default defineConfig({
   name: 'default',
   title: 'MichaelRashkin.com',
-  basePath: '/studio',
   projectId,
   dataset,
   apiVersion,
