@@ -72,7 +72,7 @@ const related = post ? relatedRaw.filter((i) => i._id !== post._id).slice(0, 6) 
           {post.summaryBullets.map((b) => (<li>{b}</li>))}
         </ul>
       ) : null}
-      {html ? <div class="prose" set:html={html} /> : <p class="muted">Add body content in Sanity.</p>}
+      {html ? <div class="article-prose" set:html={html} /> : <p class="muted">Add body content in Sanity.</p>}
       <div style="margin-top: 24px;">
         <SourcesList sources={post.sources} />
       </div>

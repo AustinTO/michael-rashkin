@@ -45,7 +45,7 @@ const related = ep ? relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6) : []
   ) : (
   <>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
+    <div class="article-prose">
       <div style="display:flex; gap: 10px; align-items:center; flex-wrap: wrap;">
         <LabelPill label="Video" />
         <span class="pill">{ep.platform}</span>
@@ -97,7 +97,7 @@ const related = ep ? relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6) : []
   </section>
 
   <section class="container" style="padding-top: 12px;">
-    <div class="prose">
+    <div class="article-prose">
       <h2>Summary</h2>
       {ep.shortDescription ? <p>{ep.shortDescription}</p> : <p class="muted">Add a short description in Sanity.</p>}
 
@@ -124,7 +124,7 @@ const related = ep ? relatedRaw.filter((i) => i._id !== ep._id).slice(0, 6) : []
       <h2>Transcript</h2>
       <details class="card" style="max-width: var(--content);">
         <summary style="cursor:pointer; font-weight: 800;">Show transcript</summary>
-        <div style="margin-top: 12px;" class="prose" set:html={transcriptHtml || '<p class="muted">Add transcript content in Sanity.</p>'}></div>
+        <div style="margin-top: 12px;" class="article-prose" set:html={transcriptHtml || '<p class="muted">Add transcript content in Sanity.</p>'}></div>
       </details>
     </div>
   </section>

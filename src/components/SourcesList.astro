@@ -4,19 +4,28 @@ const { sources, title = 'Sources' } = Astro.props as {
   title?: string;
 };
 
+const getHostname = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+};
+
 if (!sources || sources.length === 0) {
   // nothing
 }
 ---
 {sources && sources.length ? (
-  <section class="card">
+  <section class="sources-panel">
     <div class="header">{title}</div>
     <ol class="list">
       {sources.map((s) => (
         <li>
-          <div>
+          <div class="row">
             <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
             <span class="meta">
+              {getHostname(s.url)}
               {s.year ? ` • ${s.year}` : ''}{s.sourceType ? ` • ${s.sourceType}` : ''}
             </span>
           </div>
@@ -28,9 +37,56 @@ if (!sources || sources.length === 0) {
 ) : null}
 
 <style>
-  .header { font-weight: 900; margin-bottom: 10px; }
-  .list { margin: 0; padding-left: 20px; }
-  .meta { color: var(--text-muted); font-size: 13px; font-weight: 600; }
-  .note { margin-top: 4px; }
-  li { margin: 10px 0; }
+  .sources-panel {
+    max-width: var(--article-content);
+    padding: 18px 20px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--surface-1) 94%, var(--bg-main));
+  }
+
+  .header {
+    font-family: "Inter Tight", "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.98rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .list {
+    margin: 0;
+    padding-left: 1.15rem;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .list a {
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .list a:hover {
+    color: var(--accent);
+  }
+
+  .meta {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .note { margin-top: 5px; }
+
+  li {
+    margin: 12px 0;
+    padding-left: 2px;
+  }
 </style>

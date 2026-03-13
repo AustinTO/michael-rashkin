@@ -54,7 +54,7 @@ const hasAnyTopicSections = hasWhatWeKnow || hasWhatWeDontKnowYet || hasMyInterp
   ) : (
   <>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">
+    <div class="article-prose">
       <h1 style="margin-bottom: 10px;">{topic.title}</h1>
       {topic.intro ? <p class="muted" style="margin-top:0;">{topic.intro}</p> : null}
       <div style="margin-top: 10px;">
@@ -71,7 +71,7 @@ const hasAnyTopicSections = hasWhatWeKnow || hasWhatWeDontKnowYet || hasMyInterp
       ) : null}
 
       {sections.body ? (
-        <div class="prose" style="margin-top: 18px;" set:html={sections.body} />
+        <div class="article-prose" style="margin-top: 18px;" set:html={sections.body} />
       ) : null}
     </div>
   </section>
@@ -84,7 +84,7 @@ const hasAnyTopicSections = hasWhatWeKnow || hasWhatWeDontKnowYet || hasMyInterp
 
   {hasAnyTopicSections ? (
     <section class="container" style="padding-top: 10px;">
-      <div class="prose">
+      <div class="article-prose">
         {hasWhatWeKnow ? (
           <>
             <h2>What we know</h2>
