@@ -53,7 +53,6 @@ function getIntroBlockCount(value: any[], maxParagraphs: number): number {
 
       <div class="about-copy">
         <div class="about-heading">
-          <p class="about-kicker">About</p>
           <h1>{page.title}</h1>
         </div>
         {introHtml ? <div set:html={introHtml} /> : null}
@@ -114,16 +113,6 @@ function getIntroBlockCount(value: any[], maxParagraphs: number): number {
 
   .about-heading {
     margin-bottom: 22px;
-  }
-
-  .about-kicker {
-    margin: 0 0 6px;
-    font-family: "Inter Tight", "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent);
   }
 
   .about-heading h1 {
