@@ -37,8 +37,8 @@ export const Q = {
         "slug": slug.current,
         intro,
         heroImage,
-        updatedAt,
-        publishedAt
+        "publishedAt": coalesce(publishedAt, _createdAt),
+        "updatedAt": coalesce(updatedAt, _updatedAt)
       },
       pinnedContent[]->{
         _id,
@@ -48,7 +48,7 @@ export const Q = {
         heroImage,
         heroImageAlt,
         embedUrl,
-        "date": coalesce(updatedAt, publishedAt, _updatedAt),
+        "date": coalesce(updatedAt, _updatedAt, publishedAt, _createdAt),
         "contentType": select(
           _type == "mediaEpisode" => "Video",
           _type == "policyNote" => "Policy Note",
@@ -60,15 +60,15 @@ export const Q = {
 
   // Topics
   allTopics: `*[_type == "topic" && defined(slug.current)]
-    | order(coalesce(updatedAt, publishedAt, _updatedAt) desc) {
+    | order(coalesce(updatedAt, _updatedAt, publishedAt, _createdAt) desc) {
       _id,
       _type,
       title,
       "slug": slug.current,
       intro,
       heroImage,
-      updatedAt,
-      publishedAt
+      "publishedAt": coalesce(publishedAt, _createdAt),
+      "updatedAt": coalesce(updatedAt, _updatedAt)
     }`,
 
   topicBySlug: `*[_type == "topic" && slug.current == $slug][0] {
@@ -78,8 +78,8 @@ export const Q = {
       "slug": slug.current,
       intro,
       heroImage,
-      updatedAt,
-      publishedAt,
+      "publishedAt": coalesce(publishedAt, _createdAt),
+      "updatedAt": coalesce(updatedAt, _updatedAt),
       body,
       evidenceSnapshot {
         claimSummary,
@@ -103,7 +103,7 @@ export const Q = {
 
   // Lists
   latestContent: `*[_type in ["mediaEpisode","insight","policyNote"] && defined(slug.current)]
-    | order(coalesce(updatedAt, publishedAt, _updatedAt) desc)[0...12] {
+    | order(coalesce(updatedAt, _updatedAt, publishedAt, _createdAt) desc)[0...12] {
       _id,
       _type,
       title,
@@ -111,7 +111,7 @@ export const Q = {
       heroImage,
       heroImageAlt,
       embedUrl,
-      "date": coalesce(updatedAt, publishedAt, _updatedAt),
+      "date": coalesce(updatedAt, _updatedAt, publishedAt, _createdAt),
       // Normalize to a single field for UI pills
       "contentType": select(
         _type == "mediaEpisode" => "Video",
@@ -124,7 +124,7 @@ export const Q = {
     }`,
 
   allInsights: `*[_type == "insight" && defined(slug.current)]
-    | order(coalesce(updatedAt, publishedAt, _updatedAt) desc) {
+    | order(coalesce(updatedAt, _updatedAt, publishedAt, _createdAt) desc) {
       _id,
       _type,
       title,
@@ -133,9 +133,9 @@ export const Q = {
       heroImageAlt,
       embedUrl,
       contentType,
-      publishedAt,
-      updatedAt,
-      "date": coalesce(updatedAt, publishedAt, _updatedAt),
+      "publishedAt": coalesce(publishedAt, _createdAt),
+      "updatedAt": coalesce(updatedAt, _updatedAt),
+      "date": coalesce(updatedAt, _updatedAt, publishedAt, _createdAt),
       "excerpt": array::join(summaryBullets[0...2], " • "),
       "topic": primaryTopic->{title, "slug": slug.current}
     }`,
@@ -146,8 +146,8 @@ export const Q = {
       title,
       "slug": slug.current,
       contentType,
-      publishedAt,
-      updatedAt,
+      "publishedAt": coalesce(publishedAt, _createdAt),
+      "updatedAt": coalesce(updatedAt, _updatedAt),
       summaryBullets,
       body,
       sources[] {
@@ -164,7 +164,7 @@ export const Q = {
     }`,
 
   allPolicyNotes: `*[_type == "policyNote" && defined(slug.current)]
-    | order(coalesce(updatedAt, publishedAt, _updatedAt) desc) {
+    | order(coalesce(updatedAt, _updatedAt, publishedAt, _createdAt) desc) {
       _id,
       _type,
       title,
@@ -174,9 +174,9 @@ export const Q = {
       embedUrl,
       "contentType": "Policy Note",
       policyLens,
-      publishedAt,
-      updatedAt,
-      "date": coalesce(updatedAt, publishedAt, _updatedAt),
+      "publishedAt": coalesce(publishedAt, _createdAt),
+      "updatedAt": coalesce(updatedAt, _updatedAt),
+      "date": coalesce(updatedAt, _updatedAt, publishedAt, _createdAt),
       "excerpt": array::join(summaryBullets[0...2], " • "),
       "topic": primaryTopic->{title, "slug": slug.current}
     }`,
@@ -188,8 +188,8 @@ export const Q = {
       "slug": slug.current,
       "contentType": "Policy Note",
       policyLens,
-      publishedAt,
-      updatedAt,
+      "publishedAt": coalesce(publishedAt, _createdAt),
+      "updatedAt": coalesce(updatedAt, _updatedAt),
       summaryBullets,
       body,
       sources[] {
@@ -206,7 +206,7 @@ export const Q = {
     }`,
 
   allMedia: `*[_type == "mediaEpisode" && defined(slug.current)]
-    | order(coalesce(updatedAt, publishedAt, _updatedAt) desc) {
+    | order(coalesce(updatedAt, _updatedAt, publishedAt, _createdAt) desc) {
       _id,
       _type,
       title,
@@ -216,9 +216,9 @@ export const Q = {
       platform,
       embedUrl,
       shortDescription,
-      publishedAt,
-      updatedAt,
-      "date": coalesce(updatedAt, publishedAt, _updatedAt),
+      "publishedAt": coalesce(publishedAt, _createdAt),
+      "updatedAt": coalesce(updatedAt, _updatedAt),
+      "date": coalesce(updatedAt, _updatedAt, publishedAt, _createdAt),
       "contentType": "Video",
       "excerpt": shortDescription,
       "topic": primaryTopic->{title, "slug": slug.current}
@@ -245,14 +245,14 @@ export const Q = {
         sourceType,
         note
       },
-      publishedAt,
-      updatedAt,
+      "publishedAt": coalesce(publishedAt, _createdAt),
+      "updatedAt": coalesce(updatedAt, _updatedAt),
       primaryTopic->{_id, title, "slug": slug.current},
       tags
     }`,
 
   relatedByTopicId: `*[_type in ["mediaEpisode","insight","policyNote"] && primaryTopic._ref == $topicId && defined(slug.current)]
-    | order(coalesce(updatedAt, publishedAt, _updatedAt) desc) {
+    | order(coalesce(updatedAt, _updatedAt, publishedAt, _createdAt) desc) {
       _id,
       _type,
       title,
@@ -260,7 +260,7 @@ export const Q = {
       heroImage,
       heroImageAlt,
       embedUrl,
-      "date": coalesce(updatedAt, publishedAt, _updatedAt),
+      "date": coalesce(updatedAt, _updatedAt, publishedAt, _createdAt),
       "contentType": select(
         _type == "mediaEpisode" => "Video",
         _type == "policyNote" => "Policy Note",
