@@ -1,11 +1,36 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getContentPage } from '../lib/cmsPage';
+import { urlFor } from '../lib/image';
 
 const { page, html } = await getContentPage('/about', Astro.request);
+const heroImageUrl = page.heroImage ? urlFor(page.heroImage).width(1200).height(1400).fit('crop').quality(84).format('webp').url() : null;
 ---
 <BaseLayout title={`${page.title} — Michael Rashkin`} description={page.description || page.title}>
   <section class="container" style="padding-top: 38px;">
-    <div class="prose">{html ? <div set:html={html} /> : null}</div>
+    <div class="article-prose">
+      {heroImageUrl ? (
+        <img
+          src={heroImageUrl}
+          alt={page.heroImageAlt || page.title}
+          loading="eager"
+          class="about-hero"
+        />
+      ) : null}
+      {html ? <div set:html={html} /> : null}
+    </div>
   </section>
 </BaseLayout>
+
+<style>
+  .about-hero {
+    width: 100%;
+    max-width: 520px;
+    display: block;
+    margin: 0 0 24px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    object-fit: cover;
+    box-shadow: var(--depth-1);
+  }
+</style>
